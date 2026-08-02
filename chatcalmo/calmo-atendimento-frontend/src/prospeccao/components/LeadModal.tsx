@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../../lib/api";
 import { supabase } from "../lib/supabase";
 import type { Lead, Interacao, LeadStatus } from "../types";
-import { FONTES_OPORTUNIDADE, ATENDENTES_META } from "../types";
+import { FONTES_OPORTUNIDADE, CATEGORIAS, ATENDENTES_META } from "../types";
 import { hojeLocal, formatarDataBr } from "../../lib/periodo";
 import StatusBadge from "./StatusBadge";
 import InteracaoForm from "./InteracaoForm";
@@ -140,28 +140,36 @@ export default function LeadModal({ leadId, onClose, onUpdated }: Props) {
     onUpdated?.();
   }
 
-  async function salvarInstagram(valor: string, inputEl: HTMLInputElement) {
-    const handle = valor.trim().replace(/^@/, "").toLowerCase();
-    if (!handle) {
-      // não deixa salvar vazio — @ é NOT NULL no banco
-      inputEl.value = lead?.instagram ?? "";
+  async function salvarNome(valor: string, inputEl: HTMLInputElement) {
+    const nome = valor.trim();
+    if (!nome) {
+      inputEl.value = lead?.nome ?? "";
       return;
     }
-    if (handle === lead?.instagram) return;
-    const { error } = await supabase.from("leads").update({ instagram: handle }).eq("id", leadId);
+    if (nome === lead?.nome) return;
+    const { error } = await supabase.from("leads").update({ nome }).eq("id", leadId);
     if (error) {
-      // 23505 = violação de unique (handle já existe)
-      if (error.code === "23505") alert("Esse @ já está em outra oportunidade.");
-      else alert("Erro: " + error.message);
-      inputEl.value = lead?.instagram ?? "";
+      alert("Erro: " + error.message);
+      inputEl.value = lead?.nome ?? "";
       return;
     }
-    setLead((prev) => (prev ? { ...prev, instagram: handle } : null));
+    setLead((prev) => (prev ? { ...prev, nome } : null));
     onUpdated?.();
   }
 
-  // Leads vindos do Google Maps têm instagram sintético "maps:<placeId>" e sem seguidores
-  const ehMaps = !!lead && (lead.instagram ?? "").startsWith("maps:");
+  async function salvarAnoNascimento(valor: string) {
+    const ano_nascimento = valor ? parseInt(valor, 10) : null;
+    await supabase.from("leads").update({ ano_nascimento }).eq("id", leadId);
+    setLead((prev) => (prev ? { ...prev, ano_nascimento } : null));
+    onUpdated?.();
+  }
+
+  async function salvarCategoria(valor: string) {
+    const categoria = valor || null;
+    await supabase.from("leads").update({ categoria }).eq("id", leadId);
+    setLead((prev) => (prev ? { ...prev, categoria } : null));
+    onUpdated?.();
+  }
 
   return (
     <div
@@ -194,24 +202,14 @@ export default function LeadModal({ leadId, onClose, onUpdated }: Props) {
             <div className="flex items-start justify-between mb-5 pr-8">
               <div>
                 <h2 className="text-[18px] font-bold text-bright tracking-tight">
-                  {lead.nome_loja || `@${lead.instagram}`}
+                  {lead.nome}
                 </h2>
                 <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                  {ehMaps ? (
-                    <span className="text-muted text-xs">
-                      {lead.telefone || "Google Maps"}
-                    </span>
-                  ) : (
+                  {lead.categoria && <span className="text-muted text-xs">{lead.categoria}</span>}
+                  {lead.ano_nascimento != null && (
                     <>
-                      <span className="text-muted text-xs">@{lead.instagram}</span>
-                      {lead.seguidores != null && (
-                        <>
-                          <span className="text-edge text-xs">/</span>
-                          <span className="text-muted text-xs tabular-nums">
-                            {lead.seguidores.toLocaleString("pt-BR")} seguidores
-                          </span>
-                        </>
-                      )}
+                      {lead.categoria && <span className="text-edge text-xs">/</span>}
+                      <span className="text-muted text-xs tabular-nums">{lead.ano_nascimento}</span>
                     </>
                   )}
                 </div>
@@ -243,52 +241,44 @@ export default function LeadModal({ leadId, onClose, onUpdated }: Props) {
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="flex gap-2 mb-6">
-              {!ehMaps && (
-                <a
-                  href={`https://instagram.com/${lead.instagram}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-2 bg-surface border border-edge-subtle hover:border-edge text-xs font-medium text-sub hover:text-bright px-3.5 py-2 rounded-lg transition-all"
-                >
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                  Instagram
-                </a>
-              )}
-              {lead.site && (
-                <a
-                  href={lead.site}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-2 bg-surface border border-edge-subtle hover:border-edge text-xs font-medium text-sub hover:text-bright px-3.5 py-2 rounded-lg transition-all"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
-                  Site
-                </a>
-              )}
-            </div>
-
             {/* Dados da oportunidade */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
               <div>
-                <label className="text-[10px] font-semibold text-dim uppercase tracking-widest mb-2 block">{ehMaps ? "Empresa" : "@ Instagram"}</label>
-                {ehMaps ? (
+                <label className="text-[10px] font-semibold text-dim uppercase tracking-widest mb-2 block">Nome do atleta ou responsável</label>
+                <input
+                  type="text"
+                  defaultValue={lead.nome}
+                  onBlur={(e) => salvarNome(e.target.value, e.target)}
+                  placeholder="Nome completo"
+                  className="w-full bg-surface border border-edge-subtle rounded-lg px-3.5 py-2.5 text-xs text-text placeholder:text-dim/50 focus:outline-none focus:border-violet/30 focus:ring-1 focus:ring-violet/10 transition-all"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[10px] font-semibold text-dim uppercase tracking-widest mb-2 block">Ano de nascimento</label>
                   <input
-                    type="text"
-                    defaultValue={lead.nome_loja ?? ""}
-                    readOnly
-                    className="w-full bg-surface border border-edge-subtle rounded-lg px-3.5 py-2.5 text-xs text-muted cursor-default"
-                  />
-                ) : (
-                  <input
-                    type="text"
-                    defaultValue={lead.instagram}
-                    onBlur={(e) => salvarInstagram(e.target.value, e.target)}
-                    placeholder="@loja"
+                    type="number"
+                    defaultValue={lead.ano_nascimento ?? ""}
+                    onBlur={(e) => salvarAnoNascimento(e.target.value)}
+                    placeholder="2015"
+                    min="1950"
+                    max={new Date().getFullYear()}
                     className="w-full bg-surface border border-edge-subtle rounded-lg px-3.5 py-2.5 text-xs text-text placeholder:text-dim/50 focus:outline-none focus:border-violet/30 focus:ring-1 focus:ring-violet/10 transition-all"
                   />
-                )}
+                </div>
+                <div>
+                  <label className="text-[10px] font-semibold text-dim uppercase tracking-widest mb-2 block">Categoria</label>
+                  <select
+                    value={lead.categoria ?? ""}
+                    onChange={(e) => salvarCategoria(e.target.value)}
+                    className="w-full bg-surface border border-edge-subtle rounded-lg px-3.5 py-2.5 text-xs text-sub focus:outline-none focus:border-violet/30 transition-all"
+                  >
+                    <option value="">— Selecione —</option>
+                    {CATEGORIAS.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
               <div>
                 <label className="text-[10px] font-semibold text-dim uppercase tracking-widest mb-2 block">Responsavel</label>
@@ -456,7 +446,7 @@ function RegistrarVendaLead({ leadId, responsavel }: { leadId: string; responsav
   // de salvar enquanto o vendedor não mexer nela.
   const [data, setData] = useState(hojeLocal);
   const [dataTocada, setDataTocada] = useState(false);
-  const [vendedor, setVendedor] = useState(responsavel ?? ATENDENTES_META[0]);
+  const [vendedor, setVendedor] = useState(responsavel ?? ATENDENTES_META[0] ?? "");
   const [salvando, setSalvando] = useState(false);
   const [msg, setMsg] = useState("");
   const [vendas, setVendas] = useState<{ id: string; amount: number }[]>([]);

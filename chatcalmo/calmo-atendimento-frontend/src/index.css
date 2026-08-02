@@ -5,12 +5,12 @@
 @tailwind utilities;
 
 :root {
-  /* Dark (padrão) — igual ao CRM Provaí */
-  --bg-dark: #05060b;
-  --bg-card: #0c0e17;
-  --bg-card-hover: #12151f;
-  --primary: #3b82f6;
-  --primary-glow: rgba(59, 130, 246, 0.3);
+  /* Dark (padrão) — ACAP: fundo preto, destaque verde */
+  --bg-dark: #000000;
+  --bg-card: #0a0a0a;
+  --bg-card-hover: #141414;
+  --primary: #22c55e;
+  --primary-glow: rgba(34, 197, 94, 0.3);
   --accent-cyan: #2dd4bf;
   --secondary-green: #10b981;
   --text-white: rgba(255, 255, 255, 0.95);
@@ -20,26 +20,26 @@
 }
 
 [data-theme='light'] {
-  --bg-dark: #f8fafc;
-  --bg-card: #ffffff;
-  --bg-card-hover: #f1f5f9;
-  --text-white: #0f172a;
-  --text-gray: #475569;
-  --text-muted: #94a3b8;
-  --border-color: #e2e8f0;
-  --primary-glow: rgba(59, 130, 246, 0.18);
+  --bg-dark: #000000;
+  --bg-card: #0a0a0a;
+  --bg-card-hover: #141414;
+  --text-white: rgba(255, 255, 255, 0.95);
+  --text-gray: rgba(255, 255, 255, 0.55);
+  --text-muted: rgba(255, 255, 255, 0.32);
+  --border-color: rgba(255, 255, 255, 0.07);
+  --primary-glow: rgba(34, 197, 94, 0.3);
 }
 
 /* ===== Prospecção (CRM) — tokens alinhados À PALETA DO CHAT (design único). Dark = padrão. ===== */
 :root {
-  --color-base: #05060b;     --color-base-rgb: 5 6 11;
-  --color-raised: #10131d;   --color-raised-rgb: 16 19 29;
-  --color-surface: #0c0e17;  --color-surface-rgb: 12 14 23;
-  --color-panel: #12151f;    --color-panel-rgb: 18 21 31;
+  --color-base: #000000;     --color-base-rgb: 0 0 0;
+  --color-raised: #0a0a0a;   --color-raised-rgb: 10 10 10;
+  --color-surface: #0a0a0a;  --color-surface-rgb: 10 10 10;
+  --color-panel: #141414;    --color-panel-rgb: 20 20 20;
   --color-bright: #ffffff;   --color-bright-rgb: 255 255 255;
-  --color-violet: #3b82f6;       --color-violet-rgb: 59 130 246;
-  --color-violet-light: #60a5fa; --color-violet-light-rgb: 96 165 250;
-  --color-violet-deep: #2563eb;  --color-violet-deep-rgb: 37 99 235;
+  --color-violet: #22c55e;       --color-violet-rgb: 34 197 94;
+  --color-violet-light: #4ade80; --color-violet-light-rgb: 74 222 128;
+  --color-violet-deep: #16a34a;  --color-violet-deep-rgb: 22 163 74;
   --color-emerald: #34d399;  --color-emerald-rgb: 52 211 153;
   --color-amber: #fbbf24;    --color-amber-rgb: 251 191 36;
   --color-rose: #fb7185;     --color-rose-rgb: 251 113 133;
@@ -50,42 +50,42 @@
   --color-dim: rgba(255, 255, 255, 0.34);
   --color-muted: rgba(255, 255, 255, 0.55);
   --color-text: rgba(255, 255, 255, 0.92);
-  --color-violet-wash: rgba(59, 130, 246, 0.12);
-  --color-sidebar: #0c0e17;
+  --color-violet-wash: rgba(34, 197, 94, 0.12);
+  --color-sidebar: #0a0a0a;
   --color-card-glass: rgba(255, 255, 255, 0.03);
   --color-card-border: rgba(255, 255, 255, 0.07);
-  --color-modal-bg: #0c0e17;
+  --color-modal-bg: #0a0a0a;
   --color-modal-border: rgba(255, 255, 255, 0.09);
-  --color-active-bg: rgba(59, 130, 246, 0.14);
-  --color-active-glow: rgba(59, 130, 246, 0.45);
+  --color-active-bg: rgba(34, 197, 94, 0.14);
+  --color-active-glow: rgba(34, 197, 94, 0.45);
 }
 [data-theme='light'] {
-  --color-base: #f8fafc;     --color-base-rgb: 248 250 252;
-  --color-raised: #ffffff;   --color-raised-rgb: 255 255 255;
-  --color-surface: #ffffff;  --color-surface-rgb: 255 255 255;
-  --color-panel: #f1f5f9;    --color-panel-rgb: 241 245 249;
-  --color-bright: #0f172a;   --color-bright-rgb: 15 23 42;
-  --color-violet: #3b82f6;       --color-violet-rgb: 59 130 246;
-  --color-violet-light: #2563eb; --color-violet-light-rgb: 37 99 235;
-  --color-violet-deep: #1d4ed8;  --color-violet-deep-rgb: 29 78 216;
-  --color-emerald: #059669;  --color-emerald-rgb: 5 150 105;
-  --color-amber: #d97706;    --color-amber-rgb: 217 119 6;
-  --color-rose: #e11d48;     --color-rose-rgb: 225 29 72;
+  --color-base: #000000;     --color-base-rgb: 0 0 0;
+  --color-raised: #0a0a0a;   --color-raised-rgb: 10 10 10;
+  --color-surface: #0a0a0a;  --color-surface-rgb: 10 10 10;
+  --color-panel: #141414;    --color-panel-rgb: 20 20 20;
+  --color-bright: #ffffff;   --color-bright-rgb: 255 255 255;
+  --color-violet: #22c55e;       --color-violet-rgb: 34 197 94;
+  --color-violet-light: #4ade80; --color-violet-light-rgb: 74 222 128;
+  --color-violet-deep: #16a34a;  --color-violet-deep-rgb: 22 163 74;
+  --color-emerald: #34d399;  --color-emerald-rgb: 52 211 153;
+  --color-amber: #fbbf24;    --color-amber-rgb: 251 191 36;
+  --color-rose: #fb7185;     --color-rose-rgb: 251 113 133;
   --color-cyan: #2dd4bf;         --color-cyan-rgb: 45 212 191;
-  --color-cyan-light: #2dd4bf;   --color-cyan-light-rgb: 45 212 191;
-  --color-edge: rgba(15, 23, 42, 0.1);
-  --color-edge-subtle: rgba(15, 23, 42, 0.06);
-  --color-dim: rgba(15, 23, 42, 0.42);
-  --color-muted: rgba(15, 23, 42, 0.62);
-  --color-text: rgba(15, 23, 42, 0.88);
-  --color-violet-wash: rgba(59, 130, 246, 0.06);
-  --color-sidebar: #ffffff;
-  --color-card-glass: #ffffff;
-  --color-card-border: #e2e8f0;
-  --color-modal-bg: #ffffff;
-  --color-modal-border: rgba(15, 23, 42, 0.1);
-  --color-active-bg: rgba(59, 130, 246, 0.08);
-  --color-active-glow: rgba(59, 130, 246, 0.35);
+  --color-cyan-light: #5eead4;   --color-cyan-light-rgb: 94 234 212;
+  --color-edge: rgba(255, 255, 255, 0.08);
+  --color-edge-subtle: rgba(255, 255, 255, 0.06);
+  --color-dim: rgba(255, 255, 255, 0.34);
+  --color-muted: rgba(255, 255, 255, 0.55);
+  --color-text: rgba(255, 255, 255, 0.92);
+  --color-violet-wash: rgba(34, 197, 94, 0.12);
+  --color-sidebar: #0a0a0a;
+  --color-card-glass: rgba(255, 255, 255, 0.03);
+  --color-card-border: rgba(255, 255, 255, 0.07);
+  --color-modal-bg: #0a0a0a;
+  --color-modal-border: rgba(255, 255, 255, 0.09);
+  --color-active-bg: rgba(34, 197, 94, 0.14);
+  --color-active-glow: rgba(34, 197, 94, 0.45);
 }
 
 html,
@@ -97,8 +97,8 @@ body,
 body {
   font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif;
   background-color: var(--bg-dark);
-  background-image: radial-gradient(rgba(59, 130, 246, 0.035) 1px, transparent 1px),
-    radial-gradient(600px 400px at 10% 0%, rgba(59, 130, 246, 0.05), transparent),
+  background-image: radial-gradient(rgba(34, 197, 94, 0.035) 1px, transparent 1px),
+    radial-gradient(600px 400px at 10% 0%, rgba(34, 197, 94, 0.05), transparent),
     radial-gradient(500px 300px at 90% 5%, rgba(45, 212, 191, 0.04), transparent);
   background-size: 24px 24px, 100% 100%, 100% 100%;
   color: var(--text-white);
@@ -116,7 +116,7 @@ body {
   }
   .pv-btn {
     @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white transition;
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    background: linear-gradient(135deg, #16a34a, #15803d);
     box-shadow: 0 10px 24px -10px var(--primary-glow);
   }
   .pv-btn:hover {
@@ -134,12 +134,12 @@ body {
   }
   .nav-link:hover {
     @apply bg-white/[0.03] text-ink;
-    border-left-color: rgba(59, 130, 246, 0.4);
+    border-left-color: rgba(34, 197, 94, 0.4);
   }
   .nav-link.active {
     border-left-color: var(--primary);
     color: var(--text-white);
-    background: rgba(59, 130, 246, 0.09);
+    background: rgba(34, 197, 94, 0.09);
   }
 }
 
@@ -192,8 +192,8 @@ body {
 .pipeline-scroll::-webkit-scrollbar-track { background: transparent; }
 .pipeline-scroll::-webkit-scrollbar-thumb { background: var(--color-edge); border-radius: 3px; }
 .col-drop-active {
-  background: linear-gradient(180deg, rgba(59, 130, 246, 0.06) 0%, transparent 100%) !important;
-  border-color: rgba(59, 130, 246, 0.25) !important;
+  background: linear-gradient(180deg, rgba(34, 197, 94, 0.06) 0%, transparent 100%) !important;
+  border-color: rgba(34, 197, 94, 0.25) !important;
 }
 .card-lift { transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease; }
 .card-lift:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.4); }
@@ -246,10 +246,7 @@ body {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-violet) 10%, transparent);
 }
 
-/* Logo da Calmô: PNG preto. Tema escuro (padrão) -> inverte p/ branco; tema claro -> preto. */
-.logo-calmo {
-  filter: invert(1);
-}
-[data-theme='light'] .logo-calmo {
-  filter: none;
+/* Logo da ACAP: brasão colorido, sem inversão de cor. */
+.logo-acap {
+  border-radius: 8px;
 }

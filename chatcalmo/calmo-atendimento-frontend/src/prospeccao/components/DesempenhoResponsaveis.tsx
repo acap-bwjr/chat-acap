@@ -5,10 +5,10 @@ interface Props {
   leads: Lead[];
 }
 
-// No funil do desempenho do time exibimos só de "Atendimento com IA" pra frente —
-// as etapas iniciais (Novo / DM / Mensagens) poluem o quadro com zeros.
+// No funil do desempenho do time exibimos só de "Avaliação Agendada" pra frente —
+// as etapas iniciais (Novo / Contato / Respondeu) poluem o quadro com zeros.
 const FUNNEL_STATUSES: LeadStatus[] = PIPELINE_STATUSES.slice(
-  PIPELINE_STATUSES.indexOf("atendimento_ia")
+  PIPELINE_STATUSES.indexOf("avaliacao_agendada")
 );
 
 interface Stats {
@@ -16,9 +16,9 @@ interface Stats {
   total: number;
   byStatus: Record<LeadStatus, number>;
   hot: number;
-  fechou: number;
-  perdida: number;
-  taxa: number; // Win rate: fechou / (fechou + perdida) * 100
+  matriculado: number;
+  desistiu: number;
+  taxa: number; // Win rate: matriculado / (matriculado + desistiu) * 100
 }
 
 export default function DesempenhoResponsaveis({ leads }: Props) {
@@ -40,13 +40,13 @@ export default function DesempenhoResponsaveis({ leads }: Props) {
       }, {} as Record<LeadStatus, number>);
 
       const hot = items.filter((l) => HOT_STATUSES.includes(l.status)).length;
-      const fechou = items.filter((l) => l.status === "fechou").length;
-      const perdida = items.filter((l) => l.status === "perdida").length;
-      const taxa = fechou + perdida > 0 ? (fechou / (fechou + perdida)) * 100 : 0;
+      const matriculado = items.filter((l) => l.status === "matriculado").length;
+      const desistiu = items.filter((l) => l.status === "desistiu").length;
+      const taxa = matriculado + desistiu > 0 ? (matriculado / (matriculado + desistiu)) * 100 : 0;
 
-      return { nome, total: items.length, byStatus, hot, fechou, perdida, taxa };
+      return { nome, total: items.length, byStatus, hot, matriculado, desistiu, taxa };
     })
-    .sort((a, b) => b.taxa - a.taxa || b.fechou - a.fechou);
+    .sort((a, b) => b.taxa - a.taxa || b.matriculado - a.matriculado);
 
   if (stats.length === 0) return null;
 
@@ -114,8 +114,8 @@ function CompactRow({ s, rank }: { s: Stats; rank: number }) {
         {/* Métricas — 3 colunas que cabem em qualquer celular */}
         <div className="grid grid-cols-3 gap-2 pt-3 border-t border-edge-subtle/60">
           <MiniStat label="Quente" value={`${s.hot}🔥`} tone="rose" />
-          <MiniStat label="Fechou" value={`${s.fechou}✓`} tone="emerald" highlight={s.fechou > 0} />
-          <MiniStat label="Perdida" value={s.perdida} tone="orange" />
+          <MiniStat label="Matriculou" value={`${s.matriculado}✓`} tone="emerald" highlight={s.matriculado > 0} />
+          <MiniStat label="Desistiu" value={s.desistiu} tone="orange" />
         </div>
       </article>
 
@@ -175,8 +175,8 @@ function CompactRow({ s, rank }: { s: Stats; rank: number }) {
         {/* Métricas (mesmas do Top Responsáveis) + Win % grande */}
         <div className="flex items-baseline gap-5 shrink-0">
           <MiniStat label="Quente" value={`${s.hot}🔥`} tone="rose" />
-          <MiniStat label="Fechou" value={`${s.fechou}✓`} tone="emerald" highlight={s.fechou > 0} />
-          <MiniStat label="Perdida" value={s.perdida} tone="orange" />
+          <MiniStat label="Matriculou" value={`${s.matriculado}✓`} tone="emerald" highlight={s.matriculado > 0} />
+          <MiniStat label="Desistiu" value={s.desistiu} tone="orange" />
           <div className="pl-5 border-l border-edge-subtle ml-1">
             <p className="text-[28px] font-extrabold text-emerald leading-none tabular-nums">
               {s.taxa.toFixed(0)}%

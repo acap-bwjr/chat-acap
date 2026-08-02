@@ -13,7 +13,7 @@ interface Props {
 export default function LeadsPorEtapaModal({ status, leads, onClose }: Props) {
   const leadsDoStage = leads
     .filter((l) => l.status === status)
-    .sort((a, b) => (a.nome_loja || a.instagram).localeCompare(b.nome_loja || b.instagram));
+    .sort((a, b) => a.nome.localeCompare(b.nome));
 
   return (
     <div
@@ -67,13 +67,13 @@ export default function LeadsPorEtapaModal({ status, leads, onClose }: Props) {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
                   <p className="text-[13px] font-semibold text-bright truncate flex-1 min-w-0">
-                    {l.nome_loja || `@${l.instagram}`}
+                    {l.nome}
                   </p>
                   <FonteLogo fonte={l.fonte_oportunidade} />
                 </div>
                 <div className="flex items-center gap-2 mt-1 text-[10px] text-dim flex-wrap">
-                  <span className="text-dim">@{l.instagram}</span>
-                  <span className="text-dim/40">·</span>
+                  {l.categoria && <span className="text-dim">{l.categoria}</span>}
+                  {l.categoria && <span className="text-dim/40">·</span>}
                   <span className="text-sub">
                     {l.responsavel?.trim() || "— Sem responsável"}
                   </span>

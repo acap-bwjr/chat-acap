@@ -15,11 +15,11 @@ export default {
         ink: 'var(--text-white)',
         sub: 'var(--text-gray)',
         faint: 'var(--text-muted)',
-        // marca Provaí
+        // marca ACAP
         brand: {
-          DEFAULT: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
+          DEFAULT: '#22c55e',
+          600: '#16a34a',
+          700: '#15803d',
         },
         accent: {
           DEFAULT: '#2dd4bf',

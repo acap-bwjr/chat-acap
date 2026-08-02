@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
-import { LEAD_STATUSES, STATUS_LABELS, FONTES_OPORTUNIDADE, ATENDENTES_META } from "../types";
+import { LEAD_STATUSES, STATUS_LABELS, FONTES_OPORTUNIDADE, CATEGORIAS, ATENDENTES_META } from "../types";
 import type { LeadStatus } from "../types";
 
 interface Props {
@@ -9,11 +9,9 @@ interface Props {
 }
 
 export default function NovoLeadModal({ onClose, onCreated }: Props) {
-  const [instagram, setInstagram] = useState("");
-  const [nomeLoja, setNomeLoja] = useState("");
-  const [site, setSite] = useState("");
-  const [seguidores, setSeguidores] = useState("");
-  const [idioma, setIdioma] = useState<"pt" | "en" | "es">("pt");
+  const [nome, setNome] = useState("");
+  const [anoNascimento, setAnoNascimento] = useState("");
+  const [categoria, setCategoria] = useState("");
   const [status, setStatus] = useState<LeadStatus>("novo");
   const [responsavel, setResponsavel] = useState("");
   const [fonteOportunidade, setFonteOportunidade] = useState("");
@@ -26,23 +24,19 @@ export default function NovoLeadModal({ onClose, onCreated }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErro("");
-    const handle = instagram.trim().replace(/^@/, "").toLowerCase();
-    if (!handle) {
-      setErro("Instagram é obrigatório");
+    if (!nome.trim()) {
+      setErro("Nome é obrigatório");
       return;
     }
 
     setSaving(true);
 
     const { error } = await supabase.from("leads").insert({
-      instagram: handle,
-      nome_loja: nomeLoja.trim() || handle,
-      site: site.trim(),
-      seguidores: parseInt(seguidores) || 0,
-      idioma,
+      nome: nome.trim(),
+      ano_nascimento: anoNascimento ? parseInt(anoNascimento, 10) : null,
+      categoria: categoria || null,
       notas: notas.trim(),
       status,
-      tem_provador: false,
       responsavel: responsavel.trim() || null,
       fonte_oportunidade: fonteOportunidade || null,
       telefone: telefone.trim() || null,
@@ -52,7 +46,7 @@ export default function NovoLeadModal({ onClose, onCreated }: Props) {
     setSaving(false);
 
     if (error) {
-      setErro(error.code === "23505" ? "Esse @ já está no pipeline" : error.message);
+      setErro(error.message);
       return;
     }
 
@@ -79,61 +73,41 @@ export default function NovoLeadModal({ onClose, onCreated }: Props) {
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
-            <label className="text-[10px] font-semibold text-dim uppercase tracking-widest mb-1.5 block">Instagram *</label>
+            <label className="text-[10px] font-semibold text-dim uppercase tracking-widest mb-1.5 block">Nome do atleta ou responsável *</label>
             <input
               type="text"
-              value={instagram}
-              onChange={(e) => setInstagram(e.target.value)}
-              placeholder="@loja"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              placeholder="Nome completo"
               autoFocus
-              className="w-full bg-surface border border-edge-subtle rounded-lg px-3 py-2 text-sm text-text placeholder:text-dim/50 focus:outline-none focus:border-violet/30 focus:ring-1 focus:ring-violet/10 transition-all"
-            />
-          </div>
-
-          <div>
-            <label className="text-[10px] font-semibold text-dim uppercase tracking-widest mb-1.5 block">Nome da loja</label>
-            <input
-              type="text"
-              value={nomeLoja}
-              onChange={(e) => setNomeLoja(e.target.value)}
-              placeholder="Loja Tal"
-              className="w-full bg-surface border border-edge-subtle rounded-lg px-3 py-2 text-sm text-text placeholder:text-dim/50 focus:outline-none focus:border-violet/30 focus:ring-1 focus:ring-violet/10 transition-all"
-            />
-          </div>
-
-          <div>
-            <label className="text-[10px] font-semibold text-dim uppercase tracking-widest mb-1.5 block">Site</label>
-            <input
-              type="url"
-              value={site}
-              onChange={(e) => setSite(e.target.value)}
-              placeholder="https://..."
               className="w-full bg-surface border border-edge-subtle rounded-lg px-3 py-2 text-sm text-text placeholder:text-dim/50 focus:outline-none focus:border-violet/30 focus:ring-1 focus:ring-violet/10 transition-all"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[10px] font-semibold text-dim uppercase tracking-widest mb-1.5 block">Seguidores</label>
+              <label className="text-[10px] font-semibold text-dim uppercase tracking-widest mb-1.5 block">Ano de nascimento</label>
               <input
                 type="number"
-                value={seguidores}
-                onChange={(e) => setSeguidores(e.target.value)}
-                placeholder="0"
-                min="0"
+                value={anoNascimento}
+                onChange={(e) => setAnoNascimento(e.target.value)}
+                placeholder="2015"
+                min="1950"
+                max={new Date().getFullYear()}
                 className="w-full bg-surface border border-edge-subtle rounded-lg px-3 py-2 text-sm text-text placeholder:text-dim/50 focus:outline-none focus:border-violet/30 focus:ring-1 focus:ring-violet/10 transition-all"
               />
             </div>
             <div>
-              <label className="text-[10px] font-semibold text-dim uppercase tracking-widest mb-1.5 block">Idioma</label>
+              <label className="text-[10px] font-semibold text-dim uppercase tracking-widest mb-1.5 block">Categoria</label>
               <select
-                value={idioma}
-                onChange={(e) => setIdioma(e.target.value as "pt" | "en" | "es")}
+                value={categoria}
+                onChange={(e) => setCategoria(e.target.value)}
                 className="w-full bg-surface border border-edge-subtle rounded-lg px-3 py-2 text-sm text-sub focus:outline-none focus:border-violet/30 transition-all"
               >
-                <option value="pt">Português</option>
-                <option value="en">English</option>
-                <option value="es">Español</option>
+                <option value="">— Selecione —</option>
+                {CATEGORIAS.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
               </select>
             </div>
           </div>
@@ -201,7 +175,7 @@ export default function NovoLeadModal({ onClose, onCreated }: Props) {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="loja@email.com"
+                placeholder="email@exemplo.com"
                 className="w-full bg-surface border border-edge-subtle rounded-lg px-3 py-2 text-sm text-text placeholder:text-dim/50 focus:outline-none focus:border-violet/30 focus:ring-1 focus:ring-violet/10 transition-all"
               />
             </div>
@@ -230,7 +204,7 @@ export default function NovoLeadModal({ onClose, onCreated }: Props) {
             </button>
             <button
               type="submit"
-              disabled={saving || !instagram.trim()}
+              disabled={saving || !nome.trim()}
               className="flex-1 bg-violet hover:bg-violet-deep disabled:opacity-30 disabled:cursor-not-allowed text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-all"
             >
               {saving ? "Salvando..." : "Adicionar"}

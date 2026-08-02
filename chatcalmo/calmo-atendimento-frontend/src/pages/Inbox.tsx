@@ -219,7 +219,7 @@ export default function Inbox({
                 key={f}
                 onClick={() => setFilter(f)}
                 className={`rounded-full px-2.5 py-1 transition ${
-                  filter === f ? 'bg-brand text-white' : 'bg-white/5 text-sub hover:bg-white/10'
+                  filter === f ? 'bg-brand-700 text-white' : 'bg-white/5 text-sub hover:bg-white/10'
                 }`}
               >
                 {{ all: 'Todas', mine: 'Minhas', unassigned: 'Sem dono', resolved: 'Resolvidas' }[f]}
@@ -1056,7 +1056,7 @@ function DetailsPanel({
   }
 
   const H = ({ children }: { children: React.ReactNode }) => (
-    <h4 className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-accent/70">{children}</h4>
+    <h4 className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-brand/70">{children}</h4>
   );
 
   return (

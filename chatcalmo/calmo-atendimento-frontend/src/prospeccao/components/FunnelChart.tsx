@@ -4,37 +4,26 @@ import type { LeadStatus } from "../types";
 // Funil — etapas em sequência. Stand By é lateral (não conta no funil principal).
 // Cada etapa mostra o COUNT CUMULATIVO (todos que passaram por essa etapa ou além).
 const FUNNEL_STEPS: LeadStatus[] = [
-  "dm_enviada",
-  "mensagem_1",
-  "mensagem_2",
-  "mensagem_3",
-  "email_enviado",
+  "contato_feito",
   "respondeu",
-  "interessado",
-  "fechou",
+  "avaliacao_agendada",
+  "compareceu",
+  "matriculado",
 ];
 
-// Lista cumulativa: todos os status DEPOIS desta etapa (incluindo perdida)
-// porque "perdida" também passou pela etapa
+// Lista cumulativa: todos os status DEPOIS desta etapa (incluindo desistiu)
+// porque "desistiu" também passou pela etapa
 const STAGES_AFTER: Record<LeadStatus, LeadStatus[]> = {
-  novo_maps: [],
   novo: [],
-  carrinho_abandonado: [],
-  lead_coletado: [],
   descartado: [],
-  email_a_enviar: [],
-  dm_enviada: ["mensagem_1", "mensagem_2", "mensagem_3", "email_enviado", "respondeu", "atendimento_ia", "interessado", "stand_by", "fechou", "parou_responder", "perdida"],
-  mensagem_1: ["mensagem_2", "mensagem_3", "email_enviado", "respondeu", "atendimento_ia", "interessado", "stand_by", "fechou", "parou_responder", "perdida"],
-  mensagem_2: ["mensagem_3", "email_enviado", "respondeu", "atendimento_ia", "interessado", "stand_by", "fechou", "parou_responder", "perdida"],
-  mensagem_3: ["email_enviado", "respondeu", "atendimento_ia", "interessado", "stand_by", "fechou", "parou_responder", "perdida"],
-  email_enviado: ["respondeu", "atendimento_ia", "interessado", "stand_by", "fechou", "parou_responder", "perdida"],
-  respondeu: ["atendimento_ia", "interessado", "stand_by", "fechou", "parou_responder", "perdida"],
-  atendimento_ia: ["interessado", "stand_by", "fechou", "parou_responder", "perdida"],
-  interessado: ["stand_by", "fechou", "parou_responder", "perdida"],
-  stand_by: ["fechou", "parou_responder", "perdida"],
-  fechou: [],
-  parou_responder: [],
-  perdida: [],
+  contato_feito: ["respondeu", "avaliacao_agendada", "compareceu", "matriculado", "nao_compareceu", "stand_by", "desistiu"],
+  respondeu: ["avaliacao_agendada", "compareceu", "matriculado", "nao_compareceu", "stand_by", "desistiu"],
+  avaliacao_agendada: ["compareceu", "matriculado", "nao_compareceu", "stand_by", "desistiu"],
+  compareceu: ["matriculado", "stand_by", "desistiu"],
+  matriculado: [],
+  nao_compareceu: [],
+  stand_by: ["matriculado", "desistiu"],
+  desistiu: [],
 };
 
 interface Props {

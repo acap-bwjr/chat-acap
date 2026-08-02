@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { registrarChamado } from "../lib/metas";
-import { formatarTelefone } from "../lib/telefone";
 import { LEAD_STATUSES, STATUS_LABELS } from "../types";
 import type { Lead, LeadStatus } from "../types";
 import StatusBadge from "../components/StatusBadge";
@@ -38,7 +37,7 @@ export default function Leads() {
 
   const filtered = leads.filter((l) => {
     const t = busca.toLowerCase();
-    return l.instagram.toLowerCase().includes(t) || (l.nome_loja ?? "").toLowerCase().includes(t);
+    return l.nome.toLowerCase().includes(t) || (l.telefone ?? "").toLowerCase().includes(t);
   });
 
   return (
@@ -94,10 +93,9 @@ export default function Leads() {
           <table className="w-full text-xs min-w-[640px]">
             <thead>
               <tr className="border-b border-edge text-dim uppercase tracking-widest text-[10px]">
-                <th className="font-semibold text-left px-5 py-3">Loja</th>
-                <th className="font-semibold text-left px-5 py-3">Instagram</th>
-                <th className="font-semibold text-left px-5 py-3">Site</th>
-                <th className="font-semibold text-left px-5 py-3">Seg.</th>
+                <th className="font-semibold text-left px-5 py-3">Nome</th>
+                <th className="font-semibold text-left px-5 py-3">Nasc.</th>
+                <th className="font-semibold text-left px-5 py-3">Categoria</th>
                 <th className="font-semibold text-left px-5 py-3">Status</th>
                 <th className="font-semibold text-left px-5 py-3">WhatsApp</th>
                 <th className="font-semibold text-left px-5 py-3">Data</th>
@@ -111,27 +109,14 @@ export default function Leads() {
                   className="stagger-in border-b border-edge-subtle/60 hover:bg-surface/80 cursor-pointer transition-colors group"
                   style={{ animationDelay: `${i * 20}ms` }}
                 >
-                  <td className="px-5 py-3 font-medium text-bright text-[13px]">{lead.nome_loja ?? "—"}</td>
-                  <td className="px-5 py-3 text-muted">{(lead.instagram ?? "").startsWith("maps:") ? (formatarTelefone(lead.telefone) || "—") : `@${lead.instagram}`}</td>
-                  <td className="px-5 py-3">
-                    {lead.site ? (
-                      <a
-                        href={lead.site}
-                        target="_blank"
-                        rel="noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="text-violet-light hover:text-violet hover:underline underline-offset-2 transition-colors"
-                      >
-                        {new URL(lead.site).hostname}
-                      </a>
-                    ) : <span className="text-dim">—</span>}
-                  </td>
-                  <td className="px-5 py-3 text-muted tabular-nums">{lead.seguidores != null ? lead.seguidores.toLocaleString("pt-BR") : "—"}</td>
+                  <td className="px-5 py-3 font-medium text-bright text-[13px]">{lead.nome}</td>
+                  <td className="px-5 py-3 text-muted tabular-nums">{lead.ano_nascimento ?? "—"}</td>
+                  <td className="px-5 py-3 text-muted">{lead.categoria ?? "—"}</td>
                   <td className="px-5 py-3" onClick={(e) => e.stopPropagation()}>
                     <StatusBadge status={lead.status} onChange={(s) => updateStatus(lead.id, s)} />
                   </td>
                   <td className="px-5 py-3" onClick={(e) => e.stopPropagation()}>
-                    <WhatsappButton phone={lead.whatsapp ?? lead.telefone} name={lead.nome_loja} externo />
+                    <WhatsappButton phone={lead.telefone} name={lead.nome} />
                   </td>
                   <td className="px-5 py-3 text-dim">{new Date(lead.created_at).toLocaleDateString("pt-BR")}</td>
                 </tr>

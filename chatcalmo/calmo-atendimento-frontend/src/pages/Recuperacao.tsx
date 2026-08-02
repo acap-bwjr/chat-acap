@@ -5,7 +5,7 @@ import { supabase } from '../prospeccao/lib/supabase';
 import { formatarTelefone, paraWhatsapp as paraWaCRM } from '../prospeccao/lib/telefone';
 
 /** Responsáveis que podem receber os carrinhos enviados ao CRM. */
-const RESPONSAVEIS = ['Victor', 'Gabriel'];
+const RESPONSAVEIS: string[] = [];
 
 // Recuperação de carrinho (Nuvemshop) — implementação própria.
 // O token da loja fica no servidor; aqui só consumimos /api/recuperacao/*.

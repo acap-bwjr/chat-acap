@@ -67,7 +67,7 @@ export async function gerarRelatorioGeral(f: Faixa): Promise<void> {
       import('pdfmake/build/vfs_fonts').catch(() => {
         throw new Error('não foi possível carregar as fontes do PDF. Atualize a página (Ctrl+F5) e tente de novo.');
       }),
-      toDataUrl('/logo-calmo.png').catch(() => ''),
+      toDataUrl('/logo-acap.png').catch(() => ''),
     ]);
 
   const todosLeads = (leadsRes.data ?? []) as Lead[];
@@ -82,8 +82,8 @@ export async function gerarRelatorioGeral(f: Faixa): Promise<void> {
   // ---- prospecção ----
   const totalP = base.length;
   const hotP = base.filter((l) => HOT_STATUSES.includes(l.status)).length;
-  const fechouP = base.filter((l) => l.status === 'fechou').length;
-  const perdidaP = base.filter((l) => l.status === 'perdida').length;
+  const fechouP = base.filter((l) => l.status === 'matriculado').length;
+  const perdidaP = base.filter((l) => l.status === 'desistiu').length;
   const chamadosTotal = Object.values(chamados).reduce((s, v) => s + v, 0);
 
   const porEtapa = LEAD_STATUSES.map((s: LeadStatus) => ({
@@ -100,8 +100,8 @@ export async function gerarRelatorioGeral(f: Faixa): Promise<void> {
     mapaResp[k] ??= { total: 0, hot: 0, fechou: 0, perdida: 0 };
     mapaResp[k].total++;
     if (HOT_STATUSES.includes(l.status)) mapaResp[k].hot++;
-    if (l.status === 'fechou') mapaResp[k].fechou++;
-    if (l.status === 'perdida') mapaResp[k].perdida++;
+    if (l.status === 'matriculado') mapaResp[k].fechou++;
+    if (l.status === 'desistiu') mapaResp[k].perdida++;
   });
   const ranking = Object.entries(mapaResp).sort((a, b) => b[1].total - a[1].total);
 

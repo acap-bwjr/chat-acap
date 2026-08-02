@@ -13,9 +13,7 @@ import {
   SquaresFour,
   Kanban,
   Users,
-  Target,
   Star,
-  ShoppingCartSimple,
 } from '@phosphor-icons/react';
 import type { User } from '../lib/api';
 import { Logo, LogoMark } from './Logo';
@@ -46,7 +44,6 @@ const NAV: { key: Page; label: string; icon: typeof ChartBar }[] = [
 const PROSP_NAV: { key: Page; label: string; icon: typeof ChartBar }[] = [
   { key: 'prosp-pipeline', label: 'Pipeline', icon: Kanban },
   { key: 'prosp-leads', label: 'Leads', icon: Users },
-  { key: 'prosp-captacao', label: 'Captação', icon: Target },
   { key: 'prosp-objecoes', label: 'Objeções', icon: Star },
 ];
 
@@ -86,26 +83,26 @@ export default function Shell({
           className="pointer-events-none absolute right-0 top-0 h-full w-px"
           style={{
             background:
-              'linear-gradient(180deg, rgba(59,130,246,.25), transparent 30%, transparent 70%, rgba(45,212,191,.18))',
+              'linear-gradient(180deg, rgba(34,197,94,.25), transparent 30%, transparent 70%, rgba(45,212,191,.18))',
           }}
         />
 
         {/* Marca */}
         <div className="border-b border-line p-3">
           <div
-            className="flex h-[68px] items-center justify-center rounded-2xl border"
+            className="flex h-[132px] items-center justify-center rounded-2xl border"
             style={{
-              borderColor: 'rgba(59,130,246,0.22)',
-              background: 'linear-gradient(135deg, rgba(59,130,246,0.06), rgba(45,212,191,0.05))',
+              borderColor: 'rgba(34,197,94,0.22)',
+              background: 'linear-gradient(135deg, rgba(34,197,94,0.06), rgba(45,212,191,0.05))',
             }}
           >
-            <Logo size={32} />
+            <Logo size={104} />
           </div>
         </div>
 
         {/* Navegação */}
         <div className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-3">
-          <p className="px-3 pb-1 pt-2 text-[9px] font-bold uppercase tracking-[0.14em] text-accent/70">
+          <p className="px-3 pb-1 pt-2 text-[9px] font-bold uppercase tracking-[0.14em] text-brand/70">
             Visão geral
           </p>
           <button onClick={() => go('dashboard')} className={`nav-link ${page === 'dashboard' ? 'active' : ''}`}>
@@ -113,7 +110,7 @@ export default function Shell({
             Dashboard Geral
           </button>
 
-          <p className="px-3 pb-1 pt-4 text-[9px] font-bold uppercase tracking-[0.14em] text-accent/70">
+          <p className="px-3 pb-1 pt-4 text-[9px] font-bold uppercase tracking-[0.14em] text-brand/70">
             Atendimento
           </p>
           {NAV.map((item) => {
@@ -127,7 +124,7 @@ export default function Shell({
             );
           })}
 
-          <p className="px-3 pb-1 pt-4 text-[9px] font-bold uppercase tracking-[0.14em] text-accent/70">
+          <p className="px-3 pb-1 pt-4 text-[9px] font-bold uppercase tracking-[0.14em] text-brand/70">
             Prospecção
           </p>
           {PROSP_NAV.map((item) => {
@@ -141,18 +138,8 @@ export default function Shell({
             );
           })}
 
-          <p className="px-3 pb-1 pt-4 text-[9px] font-bold uppercase tracking-[0.14em] text-accent/70">
-            Recuperação
-          </p>
-          <button
-            onClick={() => go('recuperacao')}
-            className={`nav-link ${page === 'recuperacao' ? 'active' : ''}`}
-          >
-            <ShoppingCartSimple size={18} weight={page === 'recuperacao' ? 'fill' : 'regular'} />
-            Carrinhos
-          </button>
 
-          <p className="px-3 pb-1 pt-4 text-[9px] font-bold uppercase tracking-[0.14em] text-accent/70">
+          <p className="px-3 pb-1 pt-4 text-[9px] font-bold uppercase tracking-[0.14em] text-brand/70">
             Sistema
           </p>
           <button
@@ -173,7 +160,7 @@ export default function Shell({
           <div className="mt-2 flex items-center gap-2.5 rounded-lg px-2 py-2">
             <div
               className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-sm font-semibold text-white"
-              style={{ background: 'linear-gradient(135deg,#3B82F6,#2DD4BF)' }}
+              style={{ background: 'linear-gradient(135deg,#22C55E,#2DD4BF)' }}
             >
               {user.name.charAt(0)}
             </div>
@@ -202,7 +189,7 @@ export default function Shell({
             >
               <List size={22} />
             </button>
-            <LogoMark size={26} />
+            <LogoMark size={48} />
           </div>
         </div>
         <main className="min-h-0 flex-1 overflow-hidden bg-app">{children}</main>

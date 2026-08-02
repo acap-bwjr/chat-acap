@@ -66,7 +66,7 @@ export default function QuadroVendas({
                 key={p}
                 onClick={() => setFaixaLocal({ periodo: p })}
                 className={`px-3 py-1.5 font-medium transition ${
-                  faixa.periodo === p ? 'bg-brand text-white' : 'text-faint hover:bg-cardh hover:text-ink'
+                  faixa.periodo === p ? 'bg-brand-700 text-white' : 'text-faint hover:bg-cardh hover:text-ink'
                 }`}
               >
                 {PERIODO_CURTO[p]}

@@ -57,7 +57,7 @@ const chaveDe = (l: LeadMaps) => `maps:${l.place_id ?? l.id}`;
 
 // Monta a linha do CRM a partir de um lead do Google Maps
 /** Responsáveis que podem ser atribuídos ao enviar leads da captação para o CRM. */
-const RESPONSAVEIS = ["Victor", "Gabriel"];
+const RESPONSAVEIS: string[] = [];
 
 function rowParaCRM(lead: LeadMaps, responsavel?: string) {
   return {

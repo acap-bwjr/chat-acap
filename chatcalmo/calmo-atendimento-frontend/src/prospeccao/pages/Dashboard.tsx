@@ -28,9 +28,7 @@ function useTheme(): "light" | "dark" {
 }
 
 const ACTIVE_STATUSES: LeadStatus[] = [
-  "novo_maps", "novo", "carrinho_abandonado", "dm_enviada", "mensagem_1", "mensagem_2", "mensagem_3", "atendimento_ia",
-  "email_a_enviar", "email_enviado",
-  "respondeu", "stand_by", "interessado",
+  "novo", "contato_feito", "respondeu", "avaliacao_agendada", "compareceu", "nao_compareceu", "stand_by",
 ];
 
 // Compara pelo PRIMEIRO nome em minúsculo ("Victor", "victor souza" -> "victor").
@@ -113,8 +111,8 @@ export default function Dashboard({
 
       const totalP = base.length;
       const hotP = base.filter((l) => HOT_STATUSES.includes(l.status)).length;
-      const fechouP = base.filter((l) => l.status === "fechou").length;
-      const perdidaP = base.filter((l) => l.status === "perdida").length;
+      const fechouP = base.filter((l) => l.status === "matriculado").length;
+      const perdidaP = base.filter((l) => l.status === "desistiu").length;
 
       const porEtapa = LEAD_STATUSES.map((s) => ({ s, n: base.filter((l) => l.status === s).length }))
         .filter((x) => x.n > 0)
@@ -127,19 +125,19 @@ export default function Dashboard({
         mapaResp[k] ??= { total: 0, hot: 0, fechou: 0, perdida: 0 };
         mapaResp[k].total++;
         if (HOT_STATUSES.includes(l.status)) mapaResp[k].hot++;
-        if (l.status === "fechou") mapaResp[k].fechou++;
-        if (l.status === "perdida") mapaResp[k].perdida++;
+        if (l.status === "matriculado") mapaResp[k].fechou++;
+        if (l.status === "desistiu") mapaResp[k].perdida++;
       });
       const ranking = Object.entries(mapaResp).sort((a, b) => b[1].total - a[1].total);
 
-      // Clientes chamados no período (leads que saíram de Novo Maps/Novo Instagram)
+      // Clientes chamados no período (leads que saíram de Novo Contato)
       const porPessoa = await contarChamados(ini);
       const chamadosTotal = Object.values(porPessoa).reduce((s, v) => s + v, 0);
 
       const [{ default: pdfMake }, fonts, logo] = await Promise.all([
         import("pdfmake/build/pdfmake"),
         import("pdfmake/build/vfs_fonts"),
-        toDataUrl("/logo-calmo.png"),
+        toDataUrl("/logo-acap.png"),
       ]);
       const vfs = (fonts as any).default ?? (fonts as any).vfs ?? fonts;
       if (typeof (pdfMake as any).addVirtualFileSystem === "function") (pdfMake as any).addVirtualFileSystem(vfs);
@@ -203,7 +201,7 @@ export default function Dashboard({
               body: [[
                 card("Leads no período", totalP, BLUE),
                 card("Em fase quente", hotP, "#f43f5e"),
-                card("Fechados", fechouP, "#16a34a"),
+                card("Matriculados", fechouP, "#16a34a"),
                 card("Clientes chamados", chamadosTotal, "#0ea5e9"),
               ]],
             },
@@ -241,7 +239,7 @@ export default function Dashboard({
                   headerRows: 1,
                   widths: [22, "*", 56, 56, 56, 56],
                   body: [
-                    [th("#"), th("Responsável"), th("Leads", "center"), th("Quentes", "center"), th("Fechou", "center"), th("Perdida", "center")],
+                    [th("#"), th("Responsável"), th("Leads", "center"), th("Quentes", "center"), th("Matriculou", "center"), th("Desistiu", "center")],
                     ...ranking.map(([nome, r], i) => [
                       { text: `${i + 1}º`, fontSize: 8, bold: true, color: "#64748b" },
                       { text: nome, fontSize: 8 },
@@ -276,7 +274,7 @@ export default function Dashboard({
               }
             : { text: "Nenhum lead no período.", italics: true, color: "#94a3b8", fontSize: 9 },
 
-          { text: `Perdidos no período: ${perdidaP}`, fontSize: 8, color: "#94a3b8", margin: [0, 12, 0, 0] },
+          { text: `Desistências no período: ${perdidaP}`, fontSize: 8, color: "#94a3b8", margin: [0, 12, 0, 0] },
         ],
         defaultStyle: { fontSize: 9, color: "#1e293b" },
       };
@@ -335,19 +333,19 @@ export default function Dashboard({
   // === KPIs principais ===
   const total = leads.length;
   const ativos = ACTIVE_STATUSES.reduce((sum, s) => sum + (counts[s] || 0), 0);
-  const fechados = counts["fechou"] || 0;
-  const perdidos = counts["perdida"] || 0;
+  const fechados = counts["matriculado"] || 0;
+  const perdidos = counts["desistiu"] || 0;
   const descartados = counts["descartado"] || 0;
   const hot = HOT_STATUSES.reduce((sum, s) => sum + (counts[s] || 0), 0);
 
-  // Funnel cumulativo: dms = todos que passaram por dm_enviada ou além
-  const dmsAlcancadas = ["dm_enviada","mensagem_1","mensagem_2","mensagem_3","atendimento_ia","email_a_enviar","email_enviado","respondeu","interessado","stand_by","fechou","perdida"]
+  // Funnel cumulativo: contatados = todos que passaram por contato_feito ou além
+  const dmsAlcancadas = ["contato_feito","respondeu","avaliacao_agendada","compareceu","nao_compareceu","stand_by","matriculado","desistiu"]
     .reduce((s, k) => s + (counts[k as LeadStatus] || 0), 0);
-  const responderam = ["respondeu","interessado","stand_by","fechou","perdida"]
+  const responderam = ["respondeu","avaliacao_agendada","compareceu","nao_compareceu","stand_by","matriculado","desistiu"]
     .reduce((s, k) => s + (counts[k as LeadStatus] || 0), 0);
   const taxaResposta = dmsAlcancadas > 0 ? ((responderam / dmsAlcancadas) * 100) : 0;
   const taxaFechamentoSobreDM = dmsAlcancadas > 0 ? ((fechados / dmsAlcancadas) * 100) : 0;
-  const interesseTotal = (counts.interessado || 0) + (counts.fechou || 0) + (counts.perdida || 0);
+  const interesseTotal = (counts.avaliacao_agendada || 0) + (counts.compareceu || 0) + (counts.matriculado || 0) + (counts.desistiu || 0);
   const taxaFechamentoSobreInteresse = interesseTotal > 0 ? (fechados / interesseTotal) * 100 : 0;
 
   // === Metas do dia: placar do time e quem está liderando ===
@@ -364,8 +362,8 @@ export default function Dashboard({
     if (!responsaveisMap[key]) responsaveisMap[key] = { total: 0, hot: 0, fechou: 0, perdida: 0 };
     responsaveisMap[key].total++;
     if (HOT_STATUSES.includes(l.status)) responsaveisMap[key].hot++;
-    if (l.status === "fechou") responsaveisMap[key].fechou++;
-    if (l.status === "perdida") responsaveisMap[key].perdida++;
+    if (l.status === "matriculado") responsaveisMap[key].fechou++;
+    if (l.status === "desistiu") responsaveisMap[key].perdida++;
   });
   const responsaveisRanking = Object.entries(responsaveisMap)
     .map(([nome, v]) => ({
@@ -456,9 +454,9 @@ export default function Dashboard({
       {/* KPIs principais */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <KPI label="Total de Leads" value={total} color="#3B82F6" sub={`${ativos} ativos`} delay={0} />
-        <KPI label="Em Fase Quente" value={hot} color="#f43f5e" sub="Interessado · Reunião · Testando" delay={60} />
-        <KPI label="Fechados" value={fechados} color="#10b981" sub={`${perdidos} perdidos · ${descartados} descartados`} delay={120} />
-        <KPI label="Conversão DM → Fechou" value={`${taxaFechamentoSobreDM.toFixed(1)}%`} color="#22d3ee" sub={`${taxaResposta.toFixed(0)}% taxa de resposta`} delay={180} />
+        <KPI label="Em Fase Quente" value={hot} color="#f43f5e" sub="Avaliação agendada" delay={60} />
+        <KPI label="Matriculados" value={fechados} color="#10b981" sub={`${perdidos} desistiram · ${descartados} descartados`} delay={120} />
+        <KPI label="Conversão Contato → Matrícula" value={`${taxaFechamentoSobreDM.toFixed(1)}%`} color="#22d3ee" sub={`${taxaResposta.toFixed(0)}% taxa de resposta`} delay={180} />
       </div>
 
       {!embutido && <QuadroVendas />}
@@ -469,7 +467,7 @@ export default function Dashboard({
           <div className="min-w-0">
             <h2 className="text-[15px] font-bold text-bright tracking-tight">Metas do dia ⚡</h2>
             <p className="text-dim text-[11px] mt-1">
-              Cada lead que sai de <b>Novo Maps</b>/<b>Novo Instagram</b> para outra etapa conta 1 cliente chamado para o responsável · zera todo dia
+              Cada lead que sai de <b>Novo Contato</b> para outra etapa conta 1 cliente chamado para o responsável · zera todo dia
             </p>
           </div>
 
@@ -610,7 +608,7 @@ export default function Dashboard({
                 <span className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style={{ background: STATUS_HEX[l.status] }} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <p className="text-[12px] font-semibold text-bright truncate flex-1 min-w-0">{l.nome_loja || `@${l.instagram}`}</p>
+                    <p className="text-[12px] font-semibold text-bright truncate flex-1 min-w-0">{l.nome}</p>
                     <FonteLogo fonte={l.fonte_oportunidade} />
                     <span className="text-[9px] text-dim shrink-0 tabular-nums">
                       {new Date(l.updated_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
@@ -660,7 +658,7 @@ export default function Dashboard({
           <FunnelChart counts={counts} />
           <div className="grid grid-cols-3 gap-3 mt-5 pt-5 border-t border-edge-subtle">
             <MiniMetric label="Taxa de resposta" value={`${taxaResposta.toFixed(1)}%`} />
-            <MiniMetric label="Interesse → Fechou" value={`${taxaFechamentoSobreInteresse.toFixed(1)}%`} />
+            <MiniMetric label="Interesse → Matrícula" value={`${taxaFechamentoSobreInteresse.toFixed(1)}%`} />
             <MiniMetric label="Stand By" value={`${counts.stand_by || 0}`} sub="aguardando retomar" />
           </div>
         </div>
@@ -690,7 +688,7 @@ export default function Dashboard({
                 <span className="flex-1">Nome</span>
                 <span className="w-12 text-right">Total</span>
                 <span className="w-10 text-right">Quente</span>
-                <span className="w-10 text-right">Fechou</span>
+                <span className="w-10 text-right">Matric.</span>
                 <span className="w-12 text-right">Win %</span>
               </div>
             )}
@@ -801,7 +799,7 @@ export default function Dashboard({
                     <span className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style={{ background: STATUS_HEX[lead.status] }} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <p className="text-[13px] font-semibold text-bright truncate flex-1 min-w-0">{lead.nome_loja || `@${lead.instagram}`}</p>
+                        <p className="text-[13px] font-semibold text-bright truncate flex-1 min-w-0">{lead.nome}</p>
                         <FonteLogo fonte={lead.fonte_oportunidade} />
                         <span className="text-[10px] text-dim shrink-0 tabular-nums">
                           {new Date(a.created_at).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}

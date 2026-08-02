@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { registrarChamado } from "../lib/metas";
-import { formatarTelefone } from "../lib/telefone";
 import type { Lead, LeadStatus } from "../types";
 import { PIPELINE_STATUSES, STATUS_LABELS, STATUS_HEX } from "../types";
 import LeadModal from "../components/LeadModal";
 import DesempenhoResponsaveis from "../components/DesempenhoResponsaveis";
-import LeadsCapturados from "../components/LeadsCapturados";
 import FonteLogo from "../components/FonteLogo";
 import WhatsappButton from "../components/WhatsappButton";
 import LeadsPorEtapaModal from "../components/LeadsPorEtapaModal";
@@ -22,11 +20,10 @@ import {
 } from "@dnd-kit/core";
 import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
 
-// Subtítulo do card: leads do Google Maps (@maps:...) mostram o telefone (ou nada);
-// os demais mostram o @ do Instagram.
+// Subtítulo do card: categoria + ano de nascimento, quando disponíveis.
 function cardSub(lead: Lead): string {
-  if ((lead.instagram ?? "").startsWith("maps:")) return formatarTelefone(lead.telefone) || "";
-  return `@${lead.instagram}`;
+  const partes = [lead.categoria, lead.ano_nascimento].filter(Boolean);
+  return partes.join(" · ");
 }
 
 // ===== Card (arrastável) =====
@@ -57,7 +54,7 @@ function LeadCard({ lead, onClick }: { lead: Lead; onClick: () => void }) {
       {lead.ponto_positivo && <div className="absolute top-0 left-0 w-1 h-full bg-emerald" />}
       <div className="flex items-center gap-1.5">
         <p className="text-[13px] font-semibold text-bright truncate leading-snug flex-1">
-          {lead.nome_loja || `@${lead.instagram}`}
+          {lead.nome}
         </p>
         {lead.ponto_positivo && (
           <svg className="w-3 h-3 text-emerald shrink-0" fill="currentColor" viewBox="0 0 24 24">
@@ -68,12 +65,9 @@ function LeadCard({ lead, onClick }: { lead: Lead; onClick: () => void }) {
       {cardSub(lead) ? <p className="text-[11px] text-dim mt-0.5 truncate">{cardSub(lead)}</p> : <div className="mt-0.5 h-[15px]" />}
       <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-edge-subtle/60">
         <div className="flex items-center gap-1.5">
-          <span className="text-[10px] text-dim font-medium tabular-nums">
-            {lead.seguidores > 0 ? `${(lead.seguidores / 1000).toFixed(1)}k` : "—"}
-          </span>
           <FonteLogo fonte={lead.fonte_oportunidade} />
         </div>
-        <WhatsappButton phone={lead.whatsapp ?? lead.telefone} name={lead.nome_loja ?? `@${lead.instagram}`} compact externo />
+        <WhatsappButton phone={lead.telefone} name={lead.nome} compact />
       </div>
     </div>
   );
@@ -94,15 +88,12 @@ function CardOverlay({ lead }: { lead: Lead }) {
       {lead.ponto_positivo && <div className="absolute top-0 left-0 w-1 h-full bg-emerald" />}
       <div className="flex items-center gap-1.5">
         <p className="text-[13px] font-semibold text-bright truncate leading-snug flex-1">
-          {lead.nome_loja || `@${lead.instagram}`}
+          {lead.nome}
         </p>
       </div>
       {cardSub(lead) ? <p className="text-[11px] text-dim mt-0.5 truncate">{cardSub(lead)}</p> : <div className="mt-0.5 h-[15px]" />}
       <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-edge-subtle/60">
         <div className="flex items-center gap-1.5">
-          <span className="text-[10px] text-dim font-medium tabular-nums">
-            {lead.seguidores > 0 ? `${(lead.seguidores / 1000).toFixed(1)}k` : "—"}
-          </span>
           <FonteLogo fonte={lead.fonte_oportunidade} />
         </div>
       </div>
@@ -216,18 +207,17 @@ export default function Pipeline({
   ).sort();
 
   // Aplica filtros (fonte + responsavel + busca) antes do agrupamento por status
-  const buscaNorm = busca.trim().toLowerCase().replace(/^@/, "");
+  const buscaNorm = busca.trim().toLowerCase();
   const leadsFiltrados = leadsVisiveis.filter((l) => {
     if (filtroFonte !== "todas" && l.fonte_oportunidade !== filtroFonte) return false;
     if (filtroResponsavel === "__sem" && l.responsavel) return false;
     if (filtroResponsavel !== "__todos" && filtroResponsavel !== "__sem" && l.responsavel !== filtroResponsavel) return false;
     if (buscaNorm) {
       const haystack = [
-        l.instagram,
-        l.nome_loja,
-        l.site,
+        l.nome,
         l.email,
         l.telefone,
+        l.categoria,
         l.responsavel,
       ]
         .filter(Boolean)
@@ -314,7 +304,7 @@ export default function Pipeline({
           <div className="flex flex-col gap-1.5">
             <label className="text-[9px] font-bold text-dim uppercase tracking-widest">Fonte</label>
             <div className="flex gap-1">
-              {(["todas", "Instagram", "TikTok", "WhatsApp"] as const).map((f) => (
+              {(["todas", "Indicação", "Instagram", "Evento/Peneira"] as const).map((f) => (
                 <button
                   key={f}
                   onClick={() => setFiltroFonte(f)}
@@ -361,7 +351,7 @@ export default function Pipeline({
                 type="text"
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
-                placeholder="@ instagram, nome, email..."
+                placeholder="nome, telefone, email..."
                 className="bg-surface border border-edge-subtle rounded-lg pl-8 pr-7 py-1.5 text-xs text-sub placeholder:text-dim/60 focus:outline-none focus:border-violet/30 transition-all w-[220px]"
               />
               {busca && (
@@ -501,9 +491,6 @@ export default function Pipeline({
 
       {/* Desempenho por responsavel */}
       <DesempenhoResponsaveis leads={leads} />
-
-      {/* Leads capturados por plataforma (Instagram / TikTok) */}
-      <LeadsCapturados leads={leads} />
 
       {/* Popup — leads de uma etapa */}
       {etapaSelecionada && (

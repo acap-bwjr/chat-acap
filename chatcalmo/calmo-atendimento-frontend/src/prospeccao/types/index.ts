@@ -1,121 +1,83 @@
 export interface Lead {
   id: string;
-  instagram: string;
-  nome_loja: string | null;
-  site: string | null;
-  seguidores: number;
-  tem_provador: boolean;
+  nome: string;
+  ano_nascimento: number | null;
+  categoria: string | null;
   status: LeadStatus;
   notas: string;
   ponto_positivo: boolean;
   responsavel: string | null;
-  pais: Pais;
   fonte_oportunidade: string | null;
-  plataforma: string | null;
   telefone: string | null;
-  whatsapp: string | null;
   email: string | null;
   created_at: string;
   updated_at: string;
 }
 
-export type Pais = "BR" | "PT";
-
-export const PAISES: Pais[] = ["BR", "PT"];
-
-export const PAIS_LABELS: Record<Pais, string> = {
-  BR: "Brasil",
-  PT: "Portugal",
-};
-
-export const PAIS_FLAG: Record<Pais, string> = {
-  BR: "🇧🇷",
-  PT: "🇵🇹",
-};
+// Categorias por faixa etária (futsal): anual até o Sub-10, depois de 2 em 2 anos.
+export const CATEGORIAS = ["Sub-7", "Sub-8", "Sub-9", "Sub-10", "Sub-12", "Sub-14", "Sub-16", "Sub-18", "Adulto/Livre"] as const;
 
 // Fontes de oportunidade (para dropdown)
 export const FONTES_OPORTUNIDADE = [
+  "Indicação",
   "Instagram",
   "TikTok",
-  "Google Maps",
-  "Carrinho Abandonado",
-  "Indicação",
+  "Evento/Peneira",
+  "Panfletagem",
+  "Escola Parceira",
   "Site",
-  "Prospecção Ativa",
   "WhatsApp",
+  "Google Maps",
   "Meta",
-  "Evento",
   "Outro",
 ] as const;
 
 export type LeadStatus =
-  | "novo_maps"
   | "novo"
-  | "carrinho_abandonado"
-  | "dm_enviada"
-  | "mensagem_1"
-  | "mensagem_2"
-  | "mensagem_3"
-  | "email_a_enviar"
-  | "email_enviado"
+  | "contato_feito"
   | "respondeu"
-  | "atendimento_ia"
-  | "lead_coletado"
+  | "avaliacao_agendada"
+  | "compareceu"
+  | "matriculado"
+  | "nao_compareceu"
   | "stand_by"
-  | "interessado"
-  | "fechou"
-  | "parou_responder"
-  | "perdida"
+  | "desistiu"
   | "descartado";
 
 export const LEAD_STATUSES: LeadStatus[] = [
-  "novo_maps",
   "novo",
-  "carrinho_abandonado",
-  "dm_enviada",
-  "mensagem_1",
-  "mensagem_2",
-  "mensagem_3",
-  "email_a_enviar",
-  "email_enviado",
+  "contato_feito",
   "respondeu",
-  "atendimento_ia",
-  "interessado",
+  "avaliacao_agendada",
+  "compareceu",
+  "matriculado",
+  "nao_compareceu",
   "stand_by",
-  "fechou",
-  "parou_responder",
-  "perdida",
+  "desistiu",
   "descartado",
 ];
 
 // Status "quentes" — leads prontos pra avançar (usado em Top Responsáveis e Desempenho do Time)
-export const HOT_STATUSES: LeadStatus[] = ["interessado"];
+export const HOT_STATUSES: LeadStatus[] = ["avaliacao_agendada"];
 
 // ---- Metas do dia ----
 // Atendentes que têm meta diária e quantos clientes cada um precisa chamar por dia.
-export const ATENDENTES_META = ["Victor", "Gabriel"];
+export const ATENDENTES_META: string[] = [];
 export const META_DIARIA = 50;
 
-// Etapas iniciais: sair de uma delas (com responsável) conta como "cliente chamado".
-export const ETAPAS_INICIAIS: LeadStatus[] = ["novo_maps", "novo"];
+// Etapa inicial: sair dela (com responsável) conta como "cliente chamado".
+export const ETAPAS_INICIAIS: LeadStatus[] = ["novo"];
 
 export const PIPELINE_STATUSES: LeadStatus[] = [
-  "novo_maps",
   "novo",
-  "carrinho_abandonado",
-  "dm_enviada",
-  "mensagem_1",
-  "mensagem_2",
-  "mensagem_3",
-  "atendimento_ia",
-  "email_a_enviar",
-  "email_enviado",
+  "contato_feito",
   "respondeu",
-  "interessado",
+  "avaliacao_agendada",
+  "compareceu",
+  "matriculado",
+  "nao_compareceu",
   "stand_by",
-  "fechou",
-  "parou_responder",
-  "perdida",
+  "desistiu",
 ];
 
 export interface Interacao {
@@ -136,64 +98,40 @@ export const INTERACAO_TIPOS: InteracaoTipo[] = [
 ];
 
 export const STATUS_LABELS: Record<LeadStatus, string> = {
-  novo_maps: "Novo Maps",
-  novo: "Novo Instagram",
-  carrinho_abandonado: "Carrinho Abandonado",
-  dm_enviada: "DM Enviada",
-  mensagem_1: "Mensagem 1",
-  mensagem_2: "Mensagem 2",
-  mensagem_3: "Não Respondeu",
-  email_a_enviar: "Cliente Over",
-  email_enviado: "Cliente Slim",
+  novo: "Novo Contato",
+  contato_feito: "Contato Feito",
   respondeu: "Respondeu",
-  atendimento_ia: "Atendimento com IA",
-  lead_coletado: "Lead Coletado",
-  stand_by: "Stand By",
-  interessado: "Interessado",
-  fechou: "Fechou",
-  parou_responder: "Parou de Responder",
-  perdida: "Perdida",
+  avaliacao_agendada: "Avaliação Agendada",
+  compareceu: "Compareceu à Avaliação",
+  matriculado: "Matriculado",
+  nao_compareceu: "Não Compareceu",
+  stand_by: "Em Espera",
+  desistiu: "Desistiu",
   descartado: "Descartado",
 };
 
 export const STATUS_COLORS: Record<LeadStatus, { bg: string; text: string; dot: string }> = {
-  novo_maps: { bg: "bg-emerald/10", text: "text-emerald", dot: "bg-emerald" },
   novo: { bg: "bg-violet/10", text: "text-violet-light", dot: "bg-violet" },
-  carrinho_abandonado: { bg: "bg-amber/10", text: "text-amber", dot: "bg-amber" },
-  dm_enviada: { bg: "bg-cyan/10", text: "text-cyan", dot: "bg-cyan" },
-  mensagem_1: { bg: "bg-cyan/10", text: "text-cyan-light", dot: "bg-cyan-light" },
-  mensagem_2: { bg: "bg-cyan/10", text: "text-cyan-light", dot: "bg-cyan-light" },
-  mensagem_3: { bg: "bg-violet/10", text: "text-violet-light", dot: "bg-violet-light" },
-  email_a_enviar: { bg: "bg-amber/10", text: "text-amber", dot: "bg-amber" },
-  email_enviado: { bg: "bg-pink/10", text: "text-pink", dot: "bg-pink" },
+  contato_feito: { bg: "bg-cyan/10", text: "text-cyan", dot: "bg-cyan" },
   respondeu: { bg: "bg-amber/10", text: "text-amber", dot: "bg-amber" },
-  atendimento_ia: { bg: "bg-violet/10", text: "text-violet-light", dot: "bg-violet" },
-  lead_coletado: { bg: "bg-pink/10", text: "text-pink", dot: "bg-pink" },
+  avaliacao_agendada: { bg: "bg-rose/10", text: "text-rose", dot: "bg-rose" },
+  compareceu: { bg: "bg-orange/10", text: "text-orange", dot: "bg-orange" },
+  matriculado: { bg: "bg-emerald/10", text: "text-emerald", dot: "bg-emerald" },
+  nao_compareceu: { bg: "bg-stone/10", text: "text-stone", dot: "bg-stone" },
   stand_by: { bg: "bg-muted/10", text: "text-muted", dot: "bg-muted" },
-  interessado: { bg: "bg-rose/10", text: "text-rose", dot: "bg-rose" },
-  fechou: { bg: "bg-emerald/10", text: "text-emerald", dot: "bg-emerald" },
-  parou_responder: { bg: "bg-stone/10", text: "text-stone", dot: "bg-stone" },
-  perdida: { bg: "bg-orange/10", text: "text-orange", dot: "bg-orange" },
+  desistiu: { bg: "bg-orange/10", text: "text-orange", dot: "bg-orange" },
   descartado: { bg: "bg-dim/10", text: "text-dim", dot: "bg-dim" },
 };
 
 export const STATUS_HEX: Record<LeadStatus, string> = {
-  novo_maps: "#10b981",
-  novo: "#3B82F6",
-  carrinho_abandonado: "#f59e0b",
-  dm_enviada: "#06b6d4",
-  mensagem_1: "#38bdf8",
-  mensagem_2: "#60A5FA",
-  mensagem_3: "#5EEAD4",
-  email_a_enviar: "#fb923c",
-  email_enviado: "#d946ef",
-  respondeu: "#f59e0b",
-  atendimento_ia: "#2DD4BF",
-  lead_coletado: "#ec4899",
+  novo: "#818cf8",
+  contato_feito: "#22d3ee",
+  respondeu: "#fbbf24",
+  avaliacao_agendada: "#fb7185",
+  compareceu: "#fb923c",
+  matriculado: "#10b981",
+  nao_compareceu: "#a8a29e",
   stand_by: "#94a3b8",
-  interessado: "#f43f5e",
-  fechou: "#10b981",
-  parou_responder: "#78716c",
-  perdida: "#f97316",
+  desistiu: "#ef4444",
   descartado: "#52525b",
 };

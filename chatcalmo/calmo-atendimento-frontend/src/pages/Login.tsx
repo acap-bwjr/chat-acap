@@ -27,60 +27,60 @@ export default function Login({ onLogin }: { onLogin: (u: User) => void }) {
       className="relative grid h-full place-items-center overflow-hidden p-6"
       style={{
         background:
-          'radial-gradient(ellipse 70% 55% at 82% 8%, rgba(59,130,246,.40), transparent 60%), radial-gradient(ellipse 55% 50% at 98% 62%, rgba(45,212,191,.24), transparent 60%), linear-gradient(158deg, #0B1437 0%, #152c61 46%, #0c1a3c 100%)',
+          'radial-gradient(ellipse 70% 55% at 82% 8%, rgba(34,197,94,.35), transparent 60%), radial-gradient(ellipse 55% 50% at 98% 62%, rgba(45,212,191,.20), transparent 60%), linear-gradient(158deg, #000000 0%, #0a0a0a 46%, #000000 100%)',
       }}
     >
       {/* ondas */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[62%]">
-        <Wave color="#3B82F6" opacity={0.5} y={170} className="animate-[pvwave_19s_linear_infinite]" />
+        <Wave color="#22C55E" opacity={0.5} y={170} className="animate-[pvwave_19s_linear_infinite]" />
         <Wave color="#2DD4BF" opacity={0.38} y={205} className="animate-[pvwave_27s_linear_infinite_reverse]" />
-        <Wave color="#93C5FD" opacity={0.28} y={235} className="animate-[pvwave_36s_linear_infinite]" />
+        <Wave color="#4ADE80" opacity={0.28} y={235} className="animate-[pvwave_36s_linear_infinite]" />
       </div>
 
       <form
         onSubmit={submit}
-        className="relative z-10 w-full max-w-sm rounded-3xl bg-white p-9"
-        style={{ boxShadow: '0 30px 70px -20px rgba(8,12,30,.6)' }}
+        className="relative z-10 w-full max-w-sm rounded-3xl border border-white/10 bg-black p-9"
+        style={{ boxShadow: '0 30px 70px -20px rgba(0,0,0,.8)' }}
       >
         <div className="mb-5 flex items-center justify-center">
-          <img src="/logo-calmo.png" alt="Calmô" className="h-14 w-auto" />
+          <img src="/logo-acap.png" alt="ACAP" className="h-36 w-auto rounded-lg" />
         </div>
-        <h1 className="text-center text-lg font-semibold text-slate-800">Atendimento</h1>
-        <p className="mb-7 text-center text-sm text-slate-400">Entre para acessar o painel</p>
+        <h1 className="text-center text-lg font-semibold text-white">Atendimento</h1>
+        <p className="mb-7 text-center text-sm text-white/50">Entre para acessar o painel</p>
 
         {error && (
-          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-600">
+          <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-sm text-red-400">
             {error}
           </div>
         )}
 
-        <label className="mb-2 block text-sm font-medium text-slate-600">E-mail</label>
+        <label className="mb-2 block text-sm font-medium text-white/70">E-mail</label>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="mb-4 w-full rounded-xl border-[1.5px] border-slate-200 px-4 py-3 text-slate-800 outline-none transition focus:border-brand focus:ring-4 focus:ring-brand/10"
+          className="mb-4 w-full rounded-xl border-[1.5px] border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-brand focus:ring-4 focus:ring-brand/10"
         />
-        <label className="mb-2 block text-sm font-medium text-slate-600">Senha</label>
+        <label className="mb-2 block text-sm font-medium text-white/70">Senha</label>
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="mb-6 w-full rounded-xl border-[1.5px] border-slate-200 px-4 py-3 text-slate-800 outline-none transition focus:border-brand focus:ring-4 focus:ring-brand/10"
+          className="mb-6 w-full rounded-xl border-[1.5px] border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-brand focus:ring-4 focus:ring-brand/10"
         />
         <button
           disabled={loading}
           className="w-full rounded-xl py-3.5 font-semibold text-white transition hover:brightness-105 disabled:opacity-60"
           style={{
-            background: 'linear-gradient(135deg, #3B82F6, #2DD4BF)',
-            boxShadow: '0 12px 28px -8px rgba(59,130,246,.55)',
+            background: 'linear-gradient(135deg, #16A34A, #15803D)',
+            boxShadow: '0 12px 28px -8px rgba(21,128,61,.55)',
           }}
         >
           {loading ? 'Entrando…' : 'Entrar'}
         </button>
-        <p className="mt-6 text-center text-xs text-slate-300">Calmô · atendimento</p>
+        <p className="mt-6 text-center text-xs text-white/30">ACAP · atendimento</p>
       </form>
     </div>
   );
