@@ -1,0 +1,317 @@
+// Provai Chat — schema multi-tenant.
+// Tudo pendura em Account (o "tenant"). Hoje só existe a conta da Dezoitok,
+// mas a modelagem já permite N clientes sem reescrever nada.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Tenant ----------
+model Account {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  users         User[]
+  teams         Team[]
+  inboxes       Inbox[]
+  contacts      Contact[]
+  conversations Conversation[]
+  labels        Label[]
+  cannedReplies CannedReply[]
+  templates     Template[]
+  lojaNuvemshop LojaNuvemshop?
+}
+
+// ---------- Vendas registradas ----------
+// Cobre as duas origens: atendimento (ligada a uma conversa) e
+// prospecção (ligada a um lead do CRM — tabela `leads`, sem FK do Prisma).
+model Sale {
+  id             String   @id @default(cuid())
+  accountId      String
+  origem         String   @default("atendimento") // atendimento | prospeccao
+  conversationId String?
+  contactId      String?
+  leadId         String? // id do lead no CRM (uuid)
+  agentId        String? // usuário do chat, quando houver
+  agentName      String? // nome do vendedor (usado na prospecção)
+  amount         Float
+  soldAt         DateTime
+  note           String?
+  createdAt      DateTime @default(now())
+
+  @@index([accountId, soldAt])
+  @@index([agentId])
+  @@index([conversationId])
+  @@index([leadId])
+}
+
+// ---------- Recuperação de carrinho (Nuvemshop) ----------
+// Credenciais da loja. O access token NUNCA vai para o navegador: o front
+// fala só com o nosso backend, que injeta o token ao chamar a Nuvemshop.
+model LojaNuvemshop {
+  id          String   @id @default(cuid())
+  accountId   String   @unique
+  account     Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  storeId     String // id da loja na Nuvemshop
+  accessToken String // token secreto (server-side)
+  storeName   String?
+  ultimoErro  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt @default(now())
+}
+
+// ---------- Pessoas do atendimento ----------
+enum Role {
+  admin
+  agent
+}
+
+model User {
+  id           String   @id @default(cuid())
+  accountId    String
+  account      Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  name         String
+  email        String
+  passwordHash String
+  role         Role     @default(agent)
+  avatarUrl    String?
+  available    Boolean  @default(false) // online/offline p/ atribuição
+  createdAt    DateTime @default(now())
+
+  teamMemberships TeamMember[]
+  assignedConvs   Conversation[] @relation("assignee")
+  sentMessages    Message[]      @relation("agentSender")
+  cannedReplies   CannedReply[]
+
+  @@unique([accountId, email])
+  @@index([accountId])
+}
+
+model Team {
+  id        String   @id @default(cuid())
+  accountId String
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  name      String
+  createdAt DateTime @default(now())
+
+  members       TeamMember[]
+  conversations Conversation[]
+
+  @@unique([accountId, name])
+  @@index([accountId])
+}
+
+model TeamMember {
+  id     String @id @default(cuid())
+  teamId String
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+}
+
+// ---------- Canais (WhatsApp etc.) ----------
+enum ChannelType {
+  whatsapp_cloud
+}
+
+model Inbox {
+  id          String      @id @default(cuid())
+  accountId   String
+  account     Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  name        String
+  channelType ChannelType @default(whatsapp_cloud)
+
+  // Credenciais WhatsApp Cloud API
+  phoneNumberId String? // ID do número no Meta
+  wabaId        String?
+  accessToken   String? // token da Cloud API (guardado no servidor)
+  verifyToken   String? // token de verificação do webhook
+  appSecret     String?
+
+  // Estado da conexão (conector)
+  waStatus        String  @default("disconnected") // disconnected | connected | error
+  displayPhone    String? // número exibido, retornado pela Meta
+  verifiedName    String? // nome verificado da conta
+  lastError       String?
+  defaultTemplate String?
+  defaultLanguage String? @default("pt_BR")
+
+  createdAt DateTime @default(now())
+
+  conversations Conversation[]
+
+  @@index([accountId])
+}
+
+// ---------- Contatos ----------
+model Contact {
+  id         String   @id @default(cuid())
+  accountId  String
+  account    Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  name       String?
+  phone      String? // E.164 sem "+", ex: 5511999999999
+  email      String?
+  blocked    Boolean  @default(false) // contato bloqueado: mensagens recebidas são ignoradas
+  attributes Json?    @default("{}")
+  createdAt  DateTime @default(now())
+
+  conversations Conversation[]
+
+  @@unique([accountId, phone])
+  @@index([accountId])
+}
+
+// ---------- Conversas ----------
+enum ConversationStatus {
+  open
+  pending
+  resolved
+}
+
+model Conversation {
+  id        String             @id @default(cuid())
+  accountId String
+  account   Account            @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  inboxId   String
+  inbox     Inbox              @relation(fields: [inboxId], references: [id], onDelete: Cascade)
+  contactId String
+  contact   Contact            @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  status    ConversationStatus @default(pending)
+
+  assigneeId String?
+  assignee   User?   @relation("assignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  teamId     String?
+  team       Team?   @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  lastMessageAt DateTime @default(now())
+  waWindowUntil DateTime? // fim da janela de 24h da Cloud API
+  unreadCount   Int      @default(0) // mensagens recebidas ainda não lidas pelo atendente
+  botEstado     Json? // estado da triagem da Cecília (etapa + dados coletados)
+  createdAt     DateTime @default(now())
+
+  messages Message[]
+  labels   ConversationLabel[]
+
+  @@index([accountId, status])
+  @@index([accountId, assigneeId])
+  @@index([accountId, teamId])
+}
+
+// ---------- Mensagens ----------
+enum MessageDirection {
+  in // do cliente pra gente
+  out // da gente pro cliente
+}
+
+enum SenderType {
+  contact
+  agent
+  bot
+  system
+}
+
+enum MessageType {
+  text
+  image
+  audio
+  video
+  file
+  location
+  template
+}
+
+model Message {
+  id             String           @id @default(cuid())
+  conversationId String
+  conversation   Conversation     @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  direction      MessageDirection
+  senderType     SenderType
+  agentSenderId  String?
+  agentSender    User?            @relation("agentSender", fields: [agentSenderId], references: [id], onDelete: SetNull)
+
+  type       MessageType @default(text)
+  content    String?     @db.Text
+  mediaUrl   String? // URL servida (MinIO/S3)
+  mediaMime  String?
+  mediaName  String?
+  isPrivate  Boolean     @default(false) // nota interna (não vai pro cliente)
+  waMessageId String?    @unique // id da mensagem na Cloud API (dedupe)
+  status     String?     @default("sent") // sent/delivered/read/failed
+  reactionEmoji String?  // reação (emoji) que o cliente/atendente deu nesta mensagem
+  createdAt  DateTime    @default(now())
+
+  // resposta/citação (quando responde uma mensagem específica)
+  replyToId String?
+  replyTo   Message?  @relation("MessageReply", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies   Message[] @relation("MessageReply")
+
+  @@index([conversationId, createdAt])
+}
+
+// ---------- Etiquetas ----------
+model Label {
+  id        String  @id @default(cuid())
+  accountId String
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  name      String
+  color     String  @default("#6b7280")
+
+  conversations ConversationLabel[]
+
+  @@unique([accountId, name])
+  @@index([accountId])
+}
+
+model ConversationLabel {
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  labelId        String
+  label          Label        @relation(fields: [labelId], references: [id], onDelete: Cascade)
+
+  @@id([conversationId, labelId])
+}
+
+// ---------- Templates (mensagens WhatsApp / recuperação) ----------
+model Template {
+  id           String   @id @default(cuid())
+  accountId    String
+  account      Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  name         String // nome técnico (slug) enviado à Meta
+  friendlyName String? // nome amigável exibido
+  category     String   @default("UTILITY") // UTILITY | MARKETING | AUTHENTICATION
+  language     String   @default("pt_BR")
+  header       String? // texto do cabeçalho (opcional)
+  body         String   @db.Text // corpo com variáveis {{1}}, {{2}}...
+  footer       String? // rodapé (opcional)
+  buttons      Json?    @default("[]") // [{type:'QUICK_REPLY'|'URL', text, url?}]
+  status       String   @default("draft") // draft | pending | approved | rejected
+  metaTemplateId String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([accountId, name])
+  @@index([accountId])
+}
+
+// ---------- Respostas rápidas ----------
+model CannedReply {
+  id        String  @id @default(cuid())
+  accountId String
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  userId    String // dono: cada atendente vê e usa só as suas
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shortcut  String
+  content   String  @db.Text
+
+  @@unique([userId, shortcut])
+  @@index([accountId])
+  @@index([userId])
+}
