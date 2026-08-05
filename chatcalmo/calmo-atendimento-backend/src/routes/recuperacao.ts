@@ -225,7 +225,7 @@ export async function recuperacaoRoutes(app: FastifyInstance): Promise<void> {
 
   /**
    * Consulta um PEDIDO pelo número e devolve o rastreio.
-   * Usado pela Cecília (chave de bot) na triagem "Código de Rastreio".
+   * Usado pela Clara (chave de bot) na triagem "Código de Rastreio".
    */
   app.get('/api/nuvemshop/pedido', async (req, reply) => {
     const q = z.object({ numero: z.string().trim().min(1) }).parse(req.query);

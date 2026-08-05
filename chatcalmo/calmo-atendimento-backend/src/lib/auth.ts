@@ -6,7 +6,7 @@ export interface AuthTokenPayload {
   userId: string;
   accountId: string;
   role: 'admin' | 'agent';
-  isBot?: boolean; // true quando autenticado pela chave da Cecília (n8n)
+  isBot?: boolean; // true quando autenticado pela chave da Clara (n8n)
 }
 
 export function hashPassword(plain: string): Promise<string> {

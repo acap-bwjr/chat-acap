@@ -9,10 +9,10 @@ declare module 'fastify' {
 }
 
 export async function authGuard(req: FastifyRequest, reply: FastifyReply): Promise<void> {
-  // Autenticação da Cecília (n8n) via chave de bot
+  // Autenticação da Clara (n8n) via chave de bot
   const botKey = req.headers['x-bot-key'];
-  if (config.cecilia.botKey && typeof botKey === 'string' && botKey === config.cecilia.botKey) {
-    req.auth = { userId: 'cecilia', accountId: config.cecilia.accountId, role: 'agent', isBot: true };
+  if (config.clara.botKey && typeof botKey === 'string' && botKey === config.clara.botKey) {
+    req.auth = { userId: 'clara', accountId: config.clara.accountId, role: 'agent', isBot: true };
     return;
   }
 

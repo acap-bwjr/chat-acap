@@ -288,7 +288,7 @@ export async function conversationRoutes(app: FastifyInstance): Promise<void> {
         status: z.enum(['open', 'pending', 'resolved']).optional(),
         assigneeId: z.string().nullable().optional(),
         teamId: z.string().nullable().optional(),
-        botEstado: z.any().optional(), // estado da triagem (usado pela Cecília)
+        botEstado: z.any().optional(), // estado da triagem (usado pela Clara)
       })
       .parse(req.body);
 

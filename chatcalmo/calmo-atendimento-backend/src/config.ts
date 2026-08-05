@@ -19,11 +19,11 @@ export const config = {
     serviceKey: process.env.SUPABASE_SERVICE_KEY ?? '',
     bucket: process.env.SUPABASE_BUCKET ?? 'chat-midia',
   },
-  // Cecília (agente de triagem no n8n): webhook de saída + chave do bot
-  cecilia: {
-    botKey: process.env.CECILIA_BOT_KEY ?? '',
-    webhookUrl: process.env.CECILIA_WEBHOOK_URL ?? '', // ex: http://n8n:5678/webhook/calmo-triagem
-    accountId: process.env.CECILIA_ACCOUNT_ID ?? 'calmo',
+  // Clara (agente de triagem no n8n): webhook de saída + chave do bot
+  clara: {
+    botKey: process.env.CLARA_BOT_KEY ?? '',
+    webhookUrl: process.env.CLARA_WEBHOOK_URL ?? '', // ex: http://n8n:5678/webhook/calmo-triagem
+    accountId: process.env.CLARA_ACCOUNT_ID ?? 'calmo',
   },
   // Base pública do próprio backend (para o Meta chamar o webhook)
   publicBaseUrl: process.env.PUBLIC_BASE_URL ?? `http://localhost:${process.env.PORT ?? 4000}`,

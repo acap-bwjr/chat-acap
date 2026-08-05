@@ -142,10 +142,10 @@ export async function ingestInbound(inbox: {
     contact,
   });
 
-  // Dispara a Cecília (n8n) — fire-and-forget, nunca bloqueia o recebimento.
+  // Dispara a Clara (n8n) — fire-and-forget, nunca bloqueia o recebimento.
   // Só para conversas SEM atendente humano: assim que alguém assume, o bot cala.
-  if (config.cecilia.webhookUrl && !conversation.assigneeId) {
-    fetch(config.cecilia.webhookUrl, {
+  if (config.clara.webhookUrl && !conversation.assigneeId) {
+    fetch(config.clara.webhookUrl, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
