@@ -20,14 +20,14 @@
 }
 
 [data-theme='light'] {
-  --bg-dark: #000000;
-  --bg-card: #0a0a0a;
-  --bg-card-hover: #141414;
-  --text-white: rgba(255, 255, 255, 0.95);
-  --text-gray: rgba(255, 255, 255, 0.55);
-  --text-muted: rgba(255, 255, 255, 0.32);
-  --border-color: rgba(255, 255, 255, 0.07);
-  --primary-glow: rgba(34, 197, 94, 0.3);
+  --bg-dark: #ffffff;
+  --bg-card: #f7f7f8;
+  --bg-card-hover: #eef0f1;
+  --text-white: rgba(0, 0, 0, 0.92);
+  --text-gray: rgba(0, 0, 0, 0.55);
+  --text-muted: rgba(0, 0, 0, 0.32);
+  --border-color: rgba(0, 0, 0, 0.08);
+  --primary-glow: rgba(34, 197, 94, 0.18);
 }
 
 /* ===== Prospecção (CRM) — tokens alinhados À PALETA DO CHAT (design único). Dark = padrão. ===== */
@@ -60,11 +60,11 @@
   --color-active-glow: rgba(34, 197, 94, 0.45);
 }
 [data-theme='light'] {
-  --color-base: #000000;     --color-base-rgb: 0 0 0;
-  --color-raised: #0a0a0a;   --color-raised-rgb: 10 10 10;
-  --color-surface: #0a0a0a;  --color-surface-rgb: 10 10 10;
-  --color-panel: #141414;    --color-panel-rgb: 20 20 20;
-  --color-bright: #ffffff;   --color-bright-rgb: 255 255 255;
+  --color-base: #ffffff;     --color-base-rgb: 255 255 255;
+  --color-raised: #f7f7f8;   --color-raised-rgb: 247 247 248;
+  --color-surface: #f7f7f8;  --color-surface-rgb: 247 247 248;
+  --color-panel: #eef0f1;    --color-panel-rgb: 238 240 241;
+  --color-bright: #000000;   --color-bright-rgb: 0 0 0;
   --color-violet: #22c55e;       --color-violet-rgb: 34 197 94;
   --color-violet-light: #4ade80; --color-violet-light-rgb: 74 222 128;
   --color-violet-deep: #16a34a;  --color-violet-deep-rgb: 22 163 74;
@@ -73,25 +73,32 @@
   --color-rose: #fb7185;     --color-rose-rgb: 251 113 133;
   --color-cyan: #2dd4bf;         --color-cyan-rgb: 45 212 191;
   --color-cyan-light: #5eead4;   --color-cyan-light-rgb: 94 234 212;
-  --color-edge: rgba(255, 255, 255, 0.08);
-  --color-edge-subtle: rgba(255, 255, 255, 0.06);
-  --color-dim: rgba(255, 255, 255, 0.34);
-  --color-muted: rgba(255, 255, 255, 0.55);
-  --color-text: rgba(255, 255, 255, 0.92);
-  --color-violet-wash: rgba(34, 197, 94, 0.12);
-  --color-sidebar: #0a0a0a;
-  --color-card-glass: rgba(255, 255, 255, 0.03);
-  --color-card-border: rgba(255, 255, 255, 0.07);
-  --color-modal-bg: #0a0a0a;
-  --color-modal-border: rgba(255, 255, 255, 0.09);
-  --color-active-bg: rgba(34, 197, 94, 0.14);
-  --color-active-glow: rgba(34, 197, 94, 0.45);
+  --color-edge: rgba(0, 0, 0, 0.08);
+  --color-edge-subtle: rgba(0, 0, 0, 0.06);
+  --color-dim: rgba(0, 0, 0, 0.34);
+  --color-muted: rgba(0, 0, 0, 0.55);
+  --color-text: rgba(0, 0, 0, 0.92);
+  --color-violet-wash: rgba(34, 197, 94, 0.08);
+  --color-sidebar: #f7f7f8;
+  --color-card-glass: rgba(0, 0, 0, 0.03);
+  --color-card-border: rgba(0, 0, 0, 0.07);
+  --color-modal-bg: #ffffff;
+  --color-modal-border: rgba(0, 0, 0, 0.09);
+  --color-active-bg: rgba(34, 197, 94, 0.10);
+  --color-active-glow: rgba(34, 197, 94, 0.35);
 }
 
 html,
 body,
 #root {
   height: 100%;
+}
+
+/* Troca de tema (claro/escuro) suave em vez de instantânea */
+*,
+*::before,
+*::after {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 body {

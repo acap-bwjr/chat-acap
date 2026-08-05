@@ -421,7 +421,7 @@ function ConvItem({
       <button onClick={onClick} className="flex w-full items-start gap-3 p-3 text-left">
       <div
         className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-sm font-semibold text-white"
-        style={{ background: 'linear-gradient(135deg,#3B82F6,#2DD4BF)' }}
+        style={{ background: 'linear-gradient(135deg,#22C55E,#15803D)' }}
       >
         {name.charAt(0).toUpperCase()}
       </div>
@@ -777,7 +777,7 @@ function Thread({
             >
               <div
                 className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-sm font-semibold text-white"
-                style={{ background: 'linear-gradient(135deg,#3B82F6,#2DD4BF)' }}
+                style={{ background: 'linear-gradient(135deg,#22C55E,#15803D)' }}
               >
                 {name.charAt(0).toUpperCase()}
               </div>
