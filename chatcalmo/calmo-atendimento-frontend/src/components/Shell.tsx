@@ -89,13 +89,7 @@ export default function Shell({
 
         {/* Marca */}
         <div className="border-b border-line p-3">
-          <div
-            className="flex h-[132px] items-center justify-center rounded-2xl border"
-            style={{
-              borderColor: 'rgba(34,197,94,0.22)',
-              background: 'linear-gradient(135deg, rgba(34,197,94,0.06), rgba(45,212,191,0.05))',
-            }}
-          >
+          <div className="flex h-[132px] items-center justify-center">
             <Logo size={104} />
           </div>
         </div>

@@ -19,11 +19,26 @@ interface Objecao {
 
 const DEFAULTS: Objecao[] = [
   {
-    id: "aquecimento",
-    gatilho: "Aquecimento / Reabordagem",
+    id: "reabordagem-info",
+    gatilho: "Pediu informação e sumiu",
     contexto:
-      "Mensagem curta pra reabrir conversa com lead morno (já provocado antes mas não respondeu). Direto ao ponto: oferta gratuita + CTA.",
-    resposta: `Boa noite, tudo bem? Bora instalar os 7 dias grátis de provador?`,
+      "Lead (pai/mãe/responsável) perguntou sobre a escolinha/clube, recebeu resposta e não voltou a falar. Mensagem curta, sem cobrança, relembrando o benefício concreto (aula avaliativa grátis) e facilitando o próximo passo.",
+    resposta: `Oi, [nome]! Tudo bem? 🐺⚽
+
+Vi que você tinha ficado de conversar sobre matricular o(a) [nome do atleta] na ACAP. Ainda temos vaga pra uma aula avaliativa gratuita, sem compromisso — é a melhor forma de conhecer o time, a comissão técnica e a estrutura de perto.
+
+Quer que eu já separe um horário essa semana pra vocês virem treinar com a gente?`,
+  },
+  {
+    id: "reabordagem-avaliacao",
+    gatilho: "Marcou avaliação e não compareceu",
+    contexto:
+      "Lead agendou a aula avaliativa (teste) e não apareceu. Não cobra explicação — assume que foi imprevisto, tira a fricção de remarcar e reforça a vaga como ainda disponível.",
+    resposta: `Oi, [nome]! Tudo certo? 🐺
+
+Vi que a avaliação do(a) [nome do atleta] tinha ficado marcada e não rolou de vir — sem problema nenhum, imprevisto acontece!
+
+Bora remarcar? Tenho horários essa semana e no fim de semana também. Me confirma o melhor dia que eu já garanto a vaga.`,
   },
   {
     id: "sem-interesse",

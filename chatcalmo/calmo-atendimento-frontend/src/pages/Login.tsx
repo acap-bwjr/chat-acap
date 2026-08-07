@@ -1,11 +1,57 @@
-import { useState } from 'react';
-import { api, setToken, type User } from '../lib/api';
+import { useEffect, useRef, useState } from 'react';
+import { api, setToken, type LoginResponse, type User } from '../lib/api';
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
 
 export default function Login({ onLogin }: { onLogin: (u: User) => void }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const googleBtnRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID) return;
+
+    async function handleGoogleCredential(response: { credential: string }) {
+      setError('');
+      setLoading(true);
+      try {
+        const r = await api.post<LoginResponse>('/api/auth/google', { credential: response.credential });
+        setToken(r.token);
+        onLogin(r.user);
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function setup() {
+      const google = (window as any).google;
+      if (!google || !googleBtnRef.current) return;
+      google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleGoogleCredential });
+      google.accounts.id.renderButton(googleBtnRef.current, {
+        theme: 'filled_black',
+        size: 'large',
+        width: 320,
+        text: 'signin_with',
+      });
+    }
+
+    if ((window as any).google) {
+      setup();
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.onload = setup;
+    document.head.appendChild(script);
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, [onLogin]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -80,6 +126,18 @@ export default function Login({ onLogin }: { onLogin: (u: User) => void }) {
         >
           {loading ? 'Entrando…' : 'Entrar'}
         </button>
+
+        {GOOGLE_CLIENT_ID && (
+          <>
+            <div className="my-5 flex items-center gap-3">
+              <div className="h-px flex-1 bg-white/10" />
+              <span className="text-xs text-white/30">ou</span>
+              <div className="h-px flex-1 bg-white/10" />
+            </div>
+            <div ref={googleBtnRef} className="flex justify-center" />
+          </>
+        )}
+
         <p className="mt-6 text-center text-xs text-white/30">ACAP · atendimento</p>
       </form>
     </div>

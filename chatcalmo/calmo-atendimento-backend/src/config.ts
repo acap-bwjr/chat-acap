@@ -27,4 +27,6 @@ export const config = {
   },
   // Base pública do próprio backend (para o Meta chamar o webhook)
   publicBaseUrl: process.env.PUBLIC_BASE_URL ?? `http://localhost:${process.env.PORT ?? 4000}`,
+  // Login com Google (Google Identity Services — token verificado no backend)
+  googleClientId: process.env.GOOGLE_CLIENT_ID ?? '',
 };

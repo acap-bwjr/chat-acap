@@ -43,6 +43,11 @@ export const api = {
   del: <T>(p: string) => req<T>('DELETE', p),
 };
 
+export interface LoginResponse {
+  token: string;
+  user: User;
+}
+
 // ---------- Tipos ----------
 export interface User {
   id: string;
