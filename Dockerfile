@@ -40,4 +40,4 @@ COPY --from=front /front/dist /usr/share/nginx/html
 COPY deploy/nginx.conf /etc/nginx/http.d/default.conf
 EXPOSE 80
 # IMPORTANTE: NÃO rodar "prisma db push" aqui (o CRM tem tabelas próprias no mesmo schema; ver Dockerfile do backend).
-CMD ["sh", "-c", "nginx && exec node dist/index.js"]
+CMD ["sh", "-c", "mkdir -p /run/nginx && nginx && exec node dist/index.js"]
