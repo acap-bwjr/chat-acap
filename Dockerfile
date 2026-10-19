@@ -30,7 +30,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=4000
 # ffmpeg: converte áudio de voz (WebM/Opus do Chrome) para OGG/Opus aceito pela Meta
-RUN apk add --no-cache ffmpeg nginx
+# openssl: o Prisma precisa dele no Alpine para conectar ao Postgres
+RUN apk add --no-cache ffmpeg nginx openssl
 COPY chatcalmo/calmo-atendimento-backend/package*.json ./
 RUN npm install --no-audit --no-fund
 COPY chatcalmo/calmo-atendimento-backend/prisma ./prisma
