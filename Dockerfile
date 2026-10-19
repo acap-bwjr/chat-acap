@@ -40,4 +40,5 @@ COPY --from=front /front/dist /usr/share/nginx/html
 COPY deploy/nginx.conf /etc/nginx/http.d/default.conf
 EXPOSE 80
 # IMPORTANTE: NÃO rodar "prisma db push" aqui (o CRM tem tabelas próprias no mesmo schema; ver Dockerfile do backend).
-CMD ["sh", "-c", "mkdir -p /run/nginx && nginx && exec node dist/index.js"]
+# PORT fixo em 4000: a 80 é do nginx (o Easypanel pode injetar PORT=80).
+CMD ["sh", "-c", "mkdir -p /run/nginx && nginx && PORT=4000 exec node dist/index.js"]
