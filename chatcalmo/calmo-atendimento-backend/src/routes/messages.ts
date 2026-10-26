@@ -64,7 +64,8 @@ async function loadConvForSend(accountId: string, conversationId: string) {
 async function senderName(auth: { userId: string; isBot?: boolean }): Promise<string | null> {
   if (auth.isBot) return config.clara.name;
   const u = await prisma.user.findUnique({ where: { id: auth.userId }, select: { name: true } });
-  return u?.name ?? null;
+  // trim: "*Nome *" não vira negrito no WhatsApp
+  return u?.name.trim() || null;
 }
 
 /** Assina o texto pro WhatsApp: nome em negrito na primeira linha. */
