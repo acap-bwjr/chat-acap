@@ -1103,6 +1103,14 @@ function DetailsPanel({
             <UserPlus size={14} /> Assumir pra mim
           </button>
         )}
+        <p className="mt-1 text-xs text-faint">
+          {conv.assignee ? 'Clara pausada nesta conversa.' : 'Clara respondendo. Ao assumir ou responder, ela pausa.'}
+        </p>
+        {conv.assignee && (
+          <button onClick={() => patchConv({ assigneeId: null })} className="pv-btn-ghost mt-1 w-full py-1 text-xs">
+            Devolver pra Clara
+          </button>
+        )}
       </section>
 
       <section>

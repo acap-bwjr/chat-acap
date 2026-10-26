@@ -143,11 +143,23 @@ export async function messageRoutes(app: FastifyInstance): Promise<void> {
       },
     });
 
-    await prisma.conversation.update({
+    // Atendente respondeu ao cliente numa conversa sem dono: assume pra ele, o que pausa a Clara.
+    const assume = !req.auth!.isBot && !body.isPrivate && !conv.assigneeId;
+    const updated = await prisma.conversation.update({
       where: { id },
-      data: { lastMessageAt: new Date(), status: conv.status === 'pending' ? 'open' : conv.status },
+      data: {
+        lastMessageAt: new Date(),
+        status: conv.status === 'pending' ? 'open' : conv.status,
+        ...(assume ? { assigneeId: req.auth!.userId } : {}),
+      },
+      include: {
+        contact: true,
+        assignee: { select: { id: true, name: true } },
+        team: { select: { id: true, name: true } },
+      },
     });
     emitToAccount(req.auth!.accountId, 'message:new', { conversationId: id, message });
+    if (assume) emitToAccount(req.auth!.accountId, 'conversation:update', updated);
     return message;
   });
 
@@ -211,11 +223,22 @@ export async function messageRoutes(app: FastifyInstance): Promise<void> {
       },
       include: { agentSender: { select: { id: true, name: true } } },
     });
-    await prisma.conversation.update({
+    const assume = !req.auth!.isBot && !conv.assigneeId;
+    const updated = await prisma.conversation.update({
       where: { id },
-      data: { lastMessageAt: new Date(), status: conv.status === 'pending' ? 'open' : conv.status },
+      data: {
+        lastMessageAt: new Date(),
+        status: conv.status === 'pending' ? 'open' : conv.status,
+        ...(assume ? { assigneeId: req.auth!.userId } : {}),
+      },
+      include: {
+        contact: true,
+        assignee: { select: { id: true, name: true } },
+        team: { select: { id: true, name: true } },
+      },
     });
     emitToAccount(req.auth!.accountId, 'message:new', { conversationId: id, message });
+    if (assume) emitToAccount(req.auth!.accountId, 'conversation:update', updated);
     return message;
   });
 
