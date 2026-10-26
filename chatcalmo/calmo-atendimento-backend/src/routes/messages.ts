@@ -60,6 +60,19 @@ async function loadConvForSend(accountId: string, conversationId: string) {
   });
 }
 
+/** Nome de quem está atendendo (Clara ou o atendente logado), exibido no topo da mensagem. */
+async function senderName(auth: { userId: string; isBot?: boolean }): Promise<string | null> {
+  if (auth.isBot) return config.clara.name;
+  const u = await prisma.user.findUnique({ where: { id: auth.userId }, select: { name: true } });
+  return u?.name ?? null;
+}
+
+/** Assina o texto pro WhatsApp: nome em negrito na primeira linha. */
+function signed(name: string | null, text?: string): string | undefined {
+  if (!name) return text;
+  return text ? `*${name}*\n${text}` : `*${name}*`;
+}
+
 function mimeToKind(mime: string): { kind: 'image' | 'audio' | 'video' | 'document'; type: MessageType } {
   if (mime.startsWith('image/')) return { kind: 'image', type: 'image' };
   if (mime.startsWith('audio/')) return { kind: 'audio', type: 'audio' };
@@ -100,7 +113,7 @@ export async function messageRoutes(app: FastifyInstance): Promise<void> {
         }
         const r = await sendText(
           { phoneNumberId: conv.inbox.phoneNumberId!, accessToken: conv.inbox.accessToken!, to: conv.contact.phone },
-          body.content,
+          signed(await senderName(req.auth!), body.content)!,
           replyToWaId,
         );
         if (r.error) return reply.code(502).send({ error: `WhatsApp: ${r.error}` });
@@ -112,7 +125,7 @@ export async function messageRoutes(app: FastifyInstance): Promise<void> {
       data: {
         conversationId: id,
         direction: 'out',
-        senderType: 'agent',
+        senderType: req.auth!.isBot ? 'bot' : 'agent',
         agentSenderId: req.auth!.isBot ? null : req.auth!.userId,
         type: 'text',
         content: body.content,
@@ -176,7 +189,8 @@ export async function messageRoutes(app: FastifyInstance): Promise<void> {
       { phoneNumberId: conv.inbox.phoneNumberId, accessToken: conv.inbox.accessToken, to: conv.contact.phone },
       kind,
       url,
-      caption,
+      // áudio não aceita legenda no WhatsApp
+      kind === 'audio' ? caption : signed(await senderName(req.auth!), caption),
     );
     if (r.error) return reply.code(502).send({ error: `WhatsApp: ${r.error}` });
 
@@ -184,7 +198,7 @@ export async function messageRoutes(app: FastifyInstance): Promise<void> {
       data: {
         conversationId: id,
         direction: 'out',
-        senderType: 'agent',
+        senderType: req.auth!.isBot ? 'bot' : 'agent',
         agentSenderId: req.auth!.isBot ? null : req.auth!.userId,
         type,
         content: caption ?? null,

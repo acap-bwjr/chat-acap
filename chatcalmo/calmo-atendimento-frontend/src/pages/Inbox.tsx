@@ -1221,6 +1221,7 @@ function Bubble({
   }
   const out = m.direction === 'out';
   const canReact = !out; // WhatsApp só permite reagir a mensagens recebidas
+  const autor = out ? (m.senderType === 'bot' ? 'Clara' : m.agentSender?.name) : null;
   return (
     <div className={`group flex items-end gap-1 ${out ? 'justify-end' : 'justify-start'}`}>
       {out && <MsgControls m={m} canReact={false} onReply={onReply} onReact={onReact} />}
@@ -1230,6 +1231,7 @@ function Bubble({
         }`}
         style={out ? { background: 'linear-gradient(135deg,#3B82F6,#2563EB)' } : undefined}
       >
+        {autor && <div className="mb-0.5 text-[11px] font-semibold text-white/80">{autor}</div>}
         {m.replyTo && <QuotedPreview r={m.replyTo} out={out} />}
         <MediaView m={m} />
         {m.content && (

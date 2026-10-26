@@ -23,7 +23,8 @@ export const config = {
   clara: {
     botKey: process.env.CLARA_BOT_KEY ?? '',
     webhookUrl: process.env.CLARA_WEBHOOK_URL ?? '', // ex: http://n8n:5678/webhook/calmo-triagem
-    accountId: process.env.CLARA_ACCOUNT_ID ?? 'calmo',
+    accountId: process.env.CLARA_ACCOUNT_ID ?? 'acap',
+    name: process.env.CLARA_NAME ?? 'Clara', // assinatura das mensagens do bot no WhatsApp
   },
   // Base pública do próprio backend (para o Meta chamar o webhook)
   publicBaseUrl: process.env.PUBLIC_BASE_URL ?? `http://localhost:${process.env.PORT ?? 4000}`,

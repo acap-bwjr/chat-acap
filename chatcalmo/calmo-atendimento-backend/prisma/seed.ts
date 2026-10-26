@@ -8,9 +8,9 @@ import { hashPassword } from '../src/lib/auth.js';
  */
 async function main() {
   const account = await prisma.account.upsert({
-    where: { id: 'calmo' },
-    update: { name: 'Calmô' },
-    create: { id: 'calmo', name: 'Calmô' },
+    where: { id: 'acap' },
+    update: { name: 'ACAP Atendimento' },
+    create: { id: 'acap', name: 'ACAP Atendimento' },
   });
 
   // Times

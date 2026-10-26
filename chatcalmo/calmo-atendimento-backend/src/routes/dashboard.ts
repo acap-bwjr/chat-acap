@@ -55,7 +55,7 @@ export async function dashboardRoutes(app: FastifyInstance): Promise<void> {
         where: {
           conversation: { accountId },
           direction: 'out',
-          senderType: 'agent',
+          senderType: { in: ['agent', 'bot'] },
           isPrivate: false,
           createdAt: periodo,
         },
